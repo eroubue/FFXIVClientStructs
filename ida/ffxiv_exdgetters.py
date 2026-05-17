@@ -417,6 +417,7 @@ if api is None:
 
 
 f = open(join(getenv("APPDATA"), "XIVLauncher", "launcherConfigV3.json"), "r")
+f = open(join(getenv("APPDATA"), "XIVLauncherCN", "launcherConfigV3.json"), "r",encoding='utf-8')
 
 config = load(f)
 
