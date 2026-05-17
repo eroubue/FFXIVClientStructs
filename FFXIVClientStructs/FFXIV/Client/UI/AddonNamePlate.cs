@@ -1,3 +1,4 @@
+using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
@@ -21,7 +22,9 @@ public unsafe partial struct AddonNamePlate {
     // might be 238 not 240 but not super relevant here
     [StructLayout(LayoutKind.Explicit, Size = 0x240)]
     public struct BakePlateRenderer {
+        [FieldOffset(0xB0)] public Texture* Texture;
         [FieldOffset(0x230)] public byte DisableFixedFontResolution; // added in 5.5
+        [FieldOffset(0x1E0)] public AtkRenderTexture RenderTexture;
     }
 
     // this is the pre-rendered texture data for a nameplate
@@ -60,9 +63,9 @@ public unsafe partial struct AddonNamePlate {
         [FieldOffset(0x6D)] public byte HPLabelState;
         [FieldOffset(0x6E)] public bool ClickThrough;
         [FieldOffset(0x6F)] public bool IsPvpEnemy;
-        // [FieldOffset(0x70)] public bool UnkBool;
+        // [FieldOffset(0x70)] private bool UnkBool;
         [FieldOffset(0x71)] public bool NeedsToBeBaked;
-        // [FieldOffset(0x72)] public int UnkBakeState;
+        // [FieldOffset(0x72)] private int UnkBakeState;
         public bool IsVisible => RootComponentNode->IsVisible();
 
         public bool IsPlayerCharacter => NamePlateKind == UIObjectKind.PlayerCharacter;

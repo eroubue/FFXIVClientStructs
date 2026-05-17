@@ -9,12 +9,29 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 //      Component::GUI::AtkEventListener
 [GenerateInterop]
 [Inherits<AtkEventListener>]
-[StructLayout(LayoutKind.Explicit, Size = 0x150)]
+[StructLayout(LayoutKind.Explicit, Size = 0x1F8)]
 public unsafe partial struct AtkTooltipManager {
     [FieldOffset(0x8)] public StdMap<Pointer<AtkResNode>, Pointer<AtkTooltipInfo>> TooltipMap;
     [FieldOffset(0x18)] public AtkStage* AtkStage;
-    [FieldOffset(0x50), FixedSizeArray] internal FixedSizeArray5<AtkTimer> _timers;
-    [FieldOffset(0x14C)] public byte Flag1; // Allows AddonItemDetail to be shown with Flag1 |= 2.
+    [FieldOffset(0x20)] public AtkResNode* TargetNode;
+    /// <remarks>
+    /// [0] Tooltip<br/>
+    /// [1] ItemDetail<br/>
+    /// [2] ActionDetail<br/>
+    /// [3] LovmActionDetail<br/>
+    /// [4] MiragePrismPrismItemDetail<br/>
+    /// [5] XBMItemDetail<br/>
+    /// [6] XBMPetActionDetail<br/>
+    /// [7] XBMBattleMonsterDetail<br/>
+    /// </remarks>
+    [FieldOffset(0x28), FixedSizeArray] internal FixedSizeArray8<Pointer<AtkManagedInterface>> _managedInterfaces;
+    [FieldOffset(0x68), FixedSizeArray] internal FixedSizeArray8<AtkTimer> _timers;
+    [FieldOffset(0x1E8)] public ushort ParentAddonId; // the opener
+
+    /// <remarks> See <see cref="AtkTooltipType"/>. </remarks>
+    [FieldOffset(0x1F4)] public byte TooltipType;
+
+    [FieldOffset(0x1F4), Obsolete("Renamed to TooltipType", true)] public byte Flag1;
 
     [MemberFunction("E8 ?? ?? ?? ?? 44 85 F6")]
     public partial void AttachTooltip(AtkTooltipType type, ushort parentId, AtkResNode* targetNode, AtkTooltipArgs* tooltipArgs);
@@ -54,7 +71,7 @@ public unsafe partial struct AtkTooltipManager {
     // to the specific agent
     [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x18)]
-    public partial struct AtkTooltipArgs : ICreatable {
+    public partial struct AtkTooltipArgs : ICreatable<AtkTooltipArgs> {
         /// <remarks> Args for <see cref="AtkTooltipType.Text"/> / AddonTooltip. </remarks>
         [FieldOffset(0), CExporterUnion("Args")] public AtkTooltipTextArgs TextArgs;
         /// <remarks> Args for <see cref="AtkTooltipType.Item"/> / AddonItemDetail. </remarks>
@@ -67,7 +84,7 @@ public unsafe partial struct AtkTooltipManager {
         [FieldOffset(0), CExporterUnion("Args")] public AtkTooltipMiragePrismPrismItemArgs MiragePrismPrismItemArgs;
 
         [MemberFunction("E8 ?? ?? ?? ?? C1 FB 04")]
-        public partial void Ctor();
+        public partial AtkTooltipArgs* Ctor();
 
         [StructLayout(LayoutKind.Explicit, Size = 0x18)]
         public struct AtkTooltipTextArgs {
@@ -144,7 +161,7 @@ public unsafe partial struct AtkTooltipManager {
         [StructLayout(LayoutKind.Explicit, Size = 0x18)]
         public struct AtkTooltipMiragePrismPrismItemArgs {
             /// <remarks>
-            /// Used for <see cref="DetailKind.MiragePrismItem"/> as ItemId.<br/>
+            /// Used for <see cref="DetailKind.MiragePrismPlateItem"/> as ItemId.<br/>
             /// When this is a MirageStoreSetItem RowId (ItemId of the Set), then specify <see cref="SetItemSlot"/> for the slot.
             /// </remarks>
             [FieldOffset(0x08)] public int Id;
@@ -154,12 +171,12 @@ public unsafe partial struct AtkTooltipManager {
             /// </remarks>
             [FieldOffset(0x10)] public int SetItemSlot;
             /// <remarks>
-            /// Used for <see cref="DetailKind.MiragePrismItem"/>, but unsure what for.<br/>
+            /// Used for <see cref="DetailKind.MiragePrismPlateItem"/>, but unsure what for.<br/>
             /// Used for <see cref="DetailKind.MiragePrismBoxItem"/> as Index in <see cref="MirageManager.PrismBoxItemIds"/>/<see cref="MirageManager.PrismBoxStain0Ids"/>/<see cref="MirageManager.PrismBoxStain1Ids"/>.
             /// </remarks>
             [FieldOffset(0x14)] public short Index;
             /// <remarks>
-            /// Either <see cref="DetailKind.MiragePrismItem"/> or <see cref="DetailKind.MiragePrismBoxItem"/>.
+            /// Either <see cref="DetailKind.MiragePrismPlateItem"/> or <see cref="DetailKind.MiragePrismBoxItem"/>.
             /// </remarks>
             [FieldOffset(0x16)] public DetailKind Kind;
         }
@@ -171,14 +188,14 @@ public unsafe partial struct AtkTooltipManager {
         [FieldOffset(0x18)] public ushort ParentId; // same as IDs in addons
         [FieldOffset(0x1A)] public AtkTooltipType Type;
     }
+}
 
-    [Flags]
-    public enum AtkTooltipType : byte {
-        None = 0,
-        Text = 1 << 0,
-        Item = 1 << 1,
-        Action = 1 << 2,
-        LovmAction = 1 << 3,
-        MiragePrismPrismItem = 1 << 4,
-    }
+[Flags]
+public enum AtkTooltipType : byte {
+    None = 0,
+    Text = 1 << 0,
+    Item = 1 << 1,
+    Action = 1 << 2,
+    LovmAction = 1 << 3,
+    MiragePrismPrismItem = 1 << 4,
 }

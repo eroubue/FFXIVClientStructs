@@ -38,7 +38,7 @@ public unsafe partial struct AddonContentsFinder {
     [FieldOffset(0x370)] public AtkComponentButton* DutyTypeButton; // "Regular Duty" / "High End duty" toggle button
 
     [FieldOffset(0x378)] public AtkTextNode* JobNameTextNode;
-    [FieldOffset(0x380)] public AtkTextNode* UnkTextNode;
+    [FieldOffset(0x380)] private AtkTextNode* UnkTextNode;
     [FieldOffset(0x388)] public AtkTextNode* LevelTextNode;
     [FieldOffset(0x390)] public AtkTextNode* ItemLevelTextNode;
     [FieldOffset(0x398)] public AtkTextNode* RoleTextNode;
@@ -50,6 +50,11 @@ public unsafe partial struct AddonContentsFinder {
     [FieldOffset(0x3C8)] public AtkResNode* RoleIconResNode;
     [FieldOffset(0x3D0)] public AtkImageNode* RoleIconImageNode;
     [FieldOffset(0x3D8)] public AtkResNode* NumOtherPartiesRecruitingResNode;
+
+    [FieldOffset(0x420)] public AtkComponentBase* LanguageLetterJ;
+    [FieldOffset(0x428)] public AtkComponentBase* LanguageLetterE;
+    [FieldOffset(0x430)] public AtkComponentBase* LanguageLetterD;
+    [FieldOffset(0x438)] public AtkComponentBase* LanguageLetterF;
 
     [FieldOffset(0x18F0)] public uint SelectedRadioButton; // Index of the selected radio button
     [FieldOffset(0x18FC)] public uint SelectedRow; // Index of the currently highlighted row, index does include headers that can't be clicked on, and collapsible headers

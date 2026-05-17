@@ -12,6 +12,11 @@ public unsafe partial struct Device {
 
     [FieldOffset(0x8)] public void* ContextArray; // Client::Graphics::Kernel::Context array
     [FieldOffset(0x10)] public void* RenderThread; // Client::Graphics::Kernel::RenderThread
+    [FieldOffset(0x28)] private CallbackManager* Unk28;
+    [FieldOffset(0x30)] private CallbackManager* Unk30;
+    [FieldOffset(0x38)] private CallbackManager* Unk38;
+    [FieldOffset(0x40)] public CallbackManager* OnResizeDestroy;
+    [FieldOffset(0x48)] public CallbackManager* OnResizeCreate;
     [FieldOffset(0x70)] public SwapChain* SwapChain;
     [FieldOffset(0x7A)] public byte RequestResolutionChange;
     [FieldOffset(0x8C)] public uint Width;
@@ -21,8 +26,8 @@ public unsafe partial struct Device {
     [FieldOffset(0x9C)] public int ColorFilter;
     [FieldOffset(0xA0)] public float ColorFilterRange;
 
-    [FieldOffset(0xAC)] public short FrameRateLimit;
-    // [FieldOffset(0xAE)] public short FrameRateLimit2; ?
+    [FieldOffset(0xA8)] public bool IsFrameRateLimited;
+    [FieldOffset(0xAE)] public short FrameRateLimit;
 
     // offset 0x758 contains render commands buffer
     // /// <summary>
@@ -37,12 +42,18 @@ public unsafe partial struct Device {
     [FieldOffset(0x9E8)] public uint NewWidth;
     [FieldOffset(0x9EC)] public uint NewHeight;
     [FieldOffset(0x9F0)] public int FrameRate;
+    [FieldOffset(0xA10)] private CallbackManager* UnkA10;
+    [FieldOffset(0xA18)] private CallbackManager* UnkA18;
 
-    [FieldOffset(0xE0A90)] public int D3DFeatureLevel; // D3D_FEATURE_LEVEL enum
-    [FieldOffset(0xE0A98)] public void* DXGIFactory; // IDXGIFactory1
-    [FieldOffset(0xE0AA0)] public void* DXGIOutput; // IDXGIOutput6
+    [FieldOffset(0xE0A90), CExporterTypeForce("D3D_FEATURE_LEVEL", true)] public int D3DFeatureLevel; // D3D_FEATURE_LEVEL enum
+    [FieldOffset(0xE0A98), CExporterTypeForce("IDXGIFactory1*", true)] public void* DXGIFactory; // IDXGIFactory1
+    [FieldOffset(0xE0AA0), CExporterTypeForce("IDXGIOutput6*", true)] public void* DXGIOutput; // IDXGIOutput6
     [FieldOffset(0xE0AA8)] public void* D3D11Forwarder; // CID3D11Forwarder (ID3D11Device vtbl present here)
-    [FieldOffset(0xE0AB0)] public void* D3D11DeviceContext; // ID3D11DeviceContext5
+    /// <remarks>
+    /// Type: ID3D11DeviceContext5* <br/>
+    /// IDA doesn't have a reference for DeviceContext5 so we use the last one possible in the list defined in d3d11_3.h being ID3D11DeviceContext4*
+    /// </remarks>
+    [FieldOffset(0xE0AB0), CExporterTypeForce("ID3D11DeviceContext4*", true)] public void* D3D11DeviceContext;
 
     [FieldOffset(0xE0AC0)] public ImmediateContext* ImmediateContext; // Client::Graphics::Kernel::Device::ImmediateContext
 
@@ -56,12 +67,39 @@ public unsafe partial struct Device {
     // /// A collection of the render command buffer array.
     // /// </summary>
     // public Span<RenderCommandBufferGroup> RenderCommandBufferGroups => new(RenderCommandBuffer, (int)RenderCommandBufferCount);
+
+    // Client::Graphics::Kernel::Device::CallbackManager
+    [GenerateInterop]
+    [StructLayout(LayoutKind.Explicit, Size = 0x40)]
+    public unsafe partial struct CallbackManager {
+        [FieldOffset(0x8)] public void* Lock; // CRITICAL_SECTION
+
+        [FieldOffset(0x30)] public Entry* Entries;
+        [FieldOffset(0x38)] public uint Capacity;
+        [FieldOffset(0x3C)] public uint Count;
+
+        [MemberFunction("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC ?? 48 8B F1 49 8B E8 48 83 C1")]
+        public partial int AddCallback(delegate* unmanaged<void*, bool> func, void* context);
+
+        [MemberFunction("48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 48 8B F1 8B FA 48 83 C1 ?? FF 15")]
+        public partial void RemoveCallback(int index);
+
+        [MemberFunction("E8 ?? ?? ?? ?? 48 8B 5B ?? 48 8B 4B")]
+        public partial bool ExecuteCallbacks();
+
+        // Unsure about the names of things inside CallbackManager though
+        [StructLayout(LayoutKind.Explicit, Size = 0x10)]
+        public unsafe partial struct Entry {
+            [FieldOffset(0x0)] public void* Function;
+            [FieldOffset(0x8)] public void* Context;
+        }
+    }
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
 public unsafe struct RenderCommandBufferGroup {
-    [FieldOffset(0x0)] public int Unk0;
-    [FieldOffset(0x4)] public int Unk1;
+    [FieldOffset(0x0)] private int Unk0;
+    [FieldOffset(0x4)] private int Unk1;
     [FieldOffset(0x8), CExporterUnion("RenderCommand")] public RenderCommandSetTarget* SetTargetCommand;
     [FieldOffset(0x8), CExporterUnion("RenderCommand")] public RenderCommandViewport* ViewportCommand;
     [FieldOffset(0x8), CExporterUnion("RenderCommand")] public RenderCommandScissorsRect* ScissorsRectCommand;
@@ -75,8 +113,8 @@ public unsafe partial struct RenderCommandSetTarget {
     [FieldOffset(0x4)] public int RenderTargetCount;
     [FieldOffset(0x8), FixedSizeArray] internal FixedSizeArray4<Pointer<Texture>> _renderTargets;
     [FieldOffset(0x28)] public Texture* DepthBuffer;
-    [FieldOffset(0x38)] public float Unk0;
-    [FieldOffset(0x3C)] public float Unk1;
+    [FieldOffset(0x38)] private float Unk0;
+    [FieldOffset(0x3C)] private float Unk1;
 }
 
 [GenerateInterop]

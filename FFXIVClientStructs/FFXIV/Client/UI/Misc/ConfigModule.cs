@@ -5,30 +5,29 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 // Client::UI::Misc::ConfigModule
 // For updating offsets:
-//  "48 8B CB E8 ?? ?? ?? ?? 48 8B 7C 24 ?? 33 C0 48 8B 5C 24"
 //    16 * (v6 + ConfigOptionCount * a6) + a1 + {ValuesFieldOffset}
 [GenerateInterop]
-[StructLayout(LayoutKind.Explicit, Size = 0xECC0)]
+[StructLayout(LayoutKind.Explicit, Size = 0xED10)]
 public unsafe partial struct ConfigModule {
     public static ConfigModule* Instance() {
         var uiModule = UI.UIModule.Instance();
         return uiModule == null ? null : uiModule->GetConfigModule();
     }
 
-    public const int ConfigOptionCount = 715;
+    public const int ConfigOptionCount = 746;
     [FieldOffset(0x28)] public UIModule* UIModule;
-    [FieldOffset(0x2C8), FixedSizeArray] internal FixedSizeArray715<Option> _options;
+    [FieldOffset(0x300), FixedSizeArray] internal FixedSizeArray746<Option> _options;
 
-    [FieldOffset(0x5C38), FixedSizeArray] internal FixedSizeArray715<OptionValue> _values;
+    [FieldOffset(0x6040), FixedSizeArray] internal FixedSizeArray2238<OptionValue> _values;
 
     [StructLayout(LayoutKind.Explicit, Size = 0x20)]
     public struct Option {
-        [FieldOffset(0x00)] public void* Unk00;
-        [FieldOffset(0x08)] public ulong Unk08;
+        [FieldOffset(0x00)] private void* Unk00;
+        [FieldOffset(0x08)] private ulong Unk08;
         [FieldOffset(0x10)] public ConfigOption OptionId;
-        [FieldOffset(0x14)] public uint Unk14;
-        [FieldOffset(0x18)] public uint Unk18;
-        [FieldOffset(0x1C)] public ushort Unk1C;
+        [FieldOffset(0x14)] private uint Unk14;
+        [FieldOffset(0x18)] private uint Unk18;
+        [FieldOffset(0x1C)] private ushort Unk1C;
 
         public string GetName() {
             if ((short)OptionId < 0) return string.Empty;

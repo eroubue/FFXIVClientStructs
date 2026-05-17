@@ -9,15 +9,16 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 // type 10
 [GenerateInterop]
 [Inherits<AtkResNode>]
-[StructLayout(LayoutKind.Explicit, Size = 0xC0)]
+[StructLayout(LayoutKind.Explicit, Size = 0xD0)]
 [VirtualTable("E8 ?? ?? ?? ?? 49 8B 55 ?? 0F B7 CD", [1, 396])]
-public unsafe partial struct AtkClippingMaskNode : ICreatable {
-    [FieldOffset(0xB0)] public AtkUldPartsList* PartsList;
-    [FieldOffset(0xB8)] public ushort PartId;
+public unsafe partial struct AtkClippingMaskNode : ICreatable<AtkClippingMaskNode> {
+    [FieldOffset(0xC0)] public AtkUldPartsList* PartsList;
+    [FieldOffset(0xC8)] public ushort PartId;
 
     // 7.0 inlines this ctor
-    public void Ctor() {
-        AtkResNode.Ctor();
+    public AtkClippingMaskNode* Ctor() {
+        var ret = AtkResNode.Ctor();
         VirtualTable = StaticVirtualTablePointer;
+        return (AtkClippingMaskNode*)ret;
     }
 }

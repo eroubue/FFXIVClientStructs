@@ -224,4 +224,85 @@ internal static class DiagnosticDescriptors {
         DiagnosticSeverity.Error,
         true,
         "A field marked with the FixedSizeArray attribute and isString set to true does not use the proper type.");
+
+    public static readonly DiagnosticDescriptor FixedSizeArrayBitArrayFieldMustBeByte = new(
+        "CSIG0305",
+        "Fixed size bit array backing field must be byte type",
+        "The field {0} marked as a fixed size bit array must use byte type",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "A field marked with the FixedSizeArray attribute and isBitArray set to true does not use the proper type.");
+
+    public static readonly DiagnosticDescriptor FixedSizeArrayBitArrayFieldBitCountMustMatchSize = new(
+        "CSIG0306",
+        "Fixed size bit array backing field must have a size that fits the bit count",
+        "The field {0} marked as a fixed size bit array must have a size that fits the bit count",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "A field marked with the FixedSizeArray attribute and isBitArray set to true has a size that doesn't match the given bitCount. The size must be calculated as (bitCount + 7) / 8.");
+
+    public static readonly DiagnosticDescriptor FixedSizeArrayFieldCannotBeStringAndBitArray = new(
+        "CSIG0307",
+        "Fixed size array cannot be both string and bit array",
+        "The field {0} marked as a fixed size array cannot have both isString and isBitArray set to true",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "A field marked with the FixedSizeArray attribute cannot set both isString and isBitArray to true.");
+
+    public static readonly DiagnosticDescriptor BitFieldIndexIsNegative = new(
+        "CSIG0401",
+        "Bit Field index must be non-negative",
+        "The bit field '{0}' has an index that is negative",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "Bit field indices are zero-based and must be greater than or equal to zero.");
+
+    public static readonly DiagnosticDescriptor BitFieldLengthIsNegativeOrZero = new(
+        "CSIG0402",
+        "Bit Field length must be greater than zero",
+        "The bit field '{0}' on field '{1}' has a length that is less than or equal to zero",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "Bit field lengths must specify at least one bit.");
+
+    public static readonly DiagnosticDescriptor BitFieldExceedsUnderlyingFieldSize = new(
+        "CSIG0403",
+        "Bit Field exceeds underlying type size",
+        "The bit field '{0}' on field '{1}' exceeds the size of the type",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "The sum of the index and bit length exceeds the size of the underlying field.");
+
+    public static readonly DiagnosticDescriptor BitFieldPropertyDefinitionMissingGetter = new(
+        "CSIG0404",
+        "Bit Field property definition is missing a getter",
+        "The property definition for bit field '{0}' on field '{1}' is missing a getter",
+        "InteropGenerator.Property",
+        DiagnosticSeverity.Error,
+        true,
+        "The property definition for a bit field is required to have a getter.");
+
+    public static readonly DiagnosticDescriptor BitFieldBackingFieldTypeNotSupported = new(
+        "CSIG0405",
+        "Bit Field backing field type not supported",
+        "The backing field '{0}' needs to be of type byte, ushort, uint or ulong",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "The backing field for a bit field is required to be either byte, ushort, uint or ulong.");
+
+    public static readonly DiagnosticDescriptor BitFieldBooleanLengthInvalid = new(
+        "CSIG0406",
+        "Bit Field length is invalid for bool",
+        "The bit field '{0}' on field '{1}' is declared as bool but its length is not 1",
+        "InteropGenerator.Field",
+        DiagnosticSeverity.Error,
+        true,
+        "A bit field of type bool is required to have a length of 1 bit.");
 }

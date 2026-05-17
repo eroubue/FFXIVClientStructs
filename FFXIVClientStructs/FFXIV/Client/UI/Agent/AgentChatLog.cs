@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using static FFXIVClientStructs.FFXIV.Common.Configuration.ConfigBase;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -11,34 +10,33 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 [Agent(AgentId.ChatLog)]
 [GenerateInterop]
 [Inherits<AgentInterface>, Inherits<ChangeEventInterface>]
-[StructLayout(LayoutKind.Explicit, Size = 0xB38)]
+[StructLayout(LayoutKind.Explicit, Size = 0xBA0)]
 public unsafe partial struct AgentChatLog {
 
     [FieldOffset(0x40)] public ChatChannel CurrentChannel;
     [FieldOffset(0x48)] public Utf8String ChannelLabel; // ie, "Say", "Party" that displays above the text input
 
-    [FieldOffset(0xB8)] public Utf8String TellPlayerName;
-    [FieldOffset(0x120)] public ushort TellWorldId;
+    [FieldOffset(0x120)] public Utf8String TellPlayerName;
+    [FieldOffset(0x188)] public ushort TellWorldId;
 
-    [FieldOffset(0x138), FixedSizeArray] internal FixedSizeArray8<Utf8String> _channelSelectorLSNames;
-    [FieldOffset(0x478), FixedSizeArray] internal FixedSizeArray8<Utf8String> _channelSelectorCWLSNames;
+    [FieldOffset(0x1A0), FixedSizeArray] internal FixedSizeArray8<Utf8String> _channelSelectorLSNames;
+    [FieldOffset(0x4E0), FixedSizeArray] internal FixedSizeArray8<Utf8String> _channelSelectorCWLSNames;
 
-    [FieldOffset(0x8A0)] public LinkedInventoryItem LinkedItem;
-    [FieldOffset(0x8F0)] public Utf8String LinkedItemName;
+    [FieldOffset(0x908)] public LinkedInventoryItem LinkedItem;
+    [FieldOffset(0x958)] public Utf8String LinkedItemName;
+    [FieldOffset(0x9C0)] public uint ContextItemId;
 
-    [FieldOffset(0x958)] public uint ContextItemId;
+    [FieldOffset(0x9D0)] public ulong LinkedPartyFinderId;
+    // [FieldOffset(0x9C8)] private byte LinkedPartyFinderUnkByte;
+    [FieldOffset(0x9E0)] public Utf8String LinkedPartyFinderLeaderName;
 
-    [FieldOffset(0x968)] public ulong LinkedPartyFinderId;
-    // [FieldOffset(0x960)] public byte LinkedPartyFinderUnkByte;
-    [FieldOffset(0x978)] public Utf8String LinkedPartyFinderLeaderName;
+    [FieldOffset(0xA48)] public uint LinkedQuestId;
+    [FieldOffset(0xA50)] public Utf8String LinkedQuestName;
 
-    [FieldOffset(0x9E0)] public uint LinkedQuestId;
-    [FieldOffset(0x9E8)] public Utf8String LinkedQuestName;
+    [FieldOffset(0xAB8)] public uint ContextStatusId; // also used for the <status> link?
+    [FieldOffset(0xAC0)] public Utf8String ContextStatusName;
 
-    [FieldOffset(0xA50)] public uint ContextStatusId; // also used for the <status> link?
-    [FieldOffset(0xA58)] public Utf8String ContextStatusName;
-
-    [FieldOffset(0xB2C)] public int ReplyChannel;
+    [FieldOffset(0xB94)] public int ReplyChannel;
 
     [MemberFunction("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 49 8D 4D 20")]
     public partial void HideLogWindow();
@@ -46,14 +44,14 @@ public unsafe partial struct AgentChatLog {
     [MemberFunction("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B F0")]
     public partial bool InsertTextCommandParam(uint textParamId, bool unk);
 
-    [MemberFunction("E8 ?? ?? ?? ?? C6 43 08 01 EB 7D")]
+    [MemberFunction("E8 ?? ?? ?? ?? 40 B5 ?? E9 ?? ?? ?? ?? 8B B9")]
     public partial void LinkItem(uint itemId);
 
     [MemberFunction("E8 ?? ?? ?? ?? BA ?? ?? ?? ?? 48 8D 4D B0 48 8B F8 E8 ?? ?? ?? ?? 41 8B D6")]
     public partial CStringPointer ChangeChannelName();
 
     // got inlined
-    // [MemberFunction("E8 ?? ?? ?? ?? 48 8B 8D ?? ?? ?? ?? 48 33 CC E8 ?? ?? ?? ?? 48 81 C4 ?? ?? ?? ?? 41 5F 41 5D 41 5C 5F")]
+    // [MemberFunction("")]
     // public partial void SetTabName(int tabIndex, Utf8String* tabName);
 
     [GenerateInterop]

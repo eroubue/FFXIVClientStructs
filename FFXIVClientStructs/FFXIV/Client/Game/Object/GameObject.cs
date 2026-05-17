@@ -12,7 +12,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.Object;
 // ctor "E8 ?? ?? ?? ?? 48 8D 8E ?? ?? ?? ?? 48 89 AE ?? ?? ?? ?? 48 8B D3"
 // base class for game objects in the world
 [GenerateInterop(isInherited: true)]
-[VirtualTable("48 8D 05 ?? ?? ?? ?? C7 81 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 48 8B C1", 3)]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? ?? ?? ?? 33 C0 48 89 41 ?? 48 89 41 ?? 89 81 ?? ?? ?? ?? 48 89 81", 3, 77)]
 [StructLayout(LayoutKind.Explicit, Size = 0x1A0)]
 public unsafe partial struct GameObject {
     [FieldOffset(0x10)] public Vector3 DefaultPosition;
@@ -21,6 +21,7 @@ public unsafe partial struct GameObject {
     [FieldOffset(0x70)] public byte EventState;
     [FieldOffset(0x78)] public uint EntityId;
     [FieldOffset(0x7C)] public uint LayoutId;
+    [FieldOffset(0x80)] public uint GimmickId;
     [FieldOffset(0x84)] public uint BaseId;
     [FieldOffset(0x88)] public uint OwnerId;
     [FieldOffset(0x8C)] public ushort ObjectIndex; // index in object table
@@ -46,7 +47,10 @@ public unsafe partial struct GameObject {
     [FieldOffset(0x100)] public DrawObject* DrawObject;
     [FieldOffset(0x108)] public SharedGroupLayoutInstance* SharedGroupLayoutInstance;
     [FieldOffset(0x110)] public uint NamePlateIconId;
-    [FieldOffset(0x118)] public int RenderFlags;
+    /// <remarks>
+    /// Controls what gets rendered or not some is hide some is show flags.
+    /// </remarks>
+    [FieldOffset(0x118)] public VisibilityFlags RenderFlags;
     /// <remarks>
     /// This value is interpolated and gets updated every frame.<br/>
     /// To set the target offset, use <see cref="NameplateOffsetTarget"/>.
@@ -57,11 +61,11 @@ public unsafe partial struct GameObject {
     /// To set the target offset, use <see cref="CameraOffsetTarget"/>.
     /// </remarks>
     [FieldOffset(0x130)] public Vector3 CameraOffset;
-    // [FieldOffset(0x140)] public Vector3 Unk140; // something SharedGroupLayoutInstance related
-    // [FieldOffset(0x150)] public uint Unk150; // something QuestRedo related
+    // [FieldOffset(0x140)] private Vector3 Unk140; // something SharedGroupLayoutInstance related
+    // [FieldOffset(0x150)] private uint Unk150; // something QuestRedo related
     [FieldOffset(0x158)] public LuaActor* LuaActor;
     [FieldOffset(0x160)] public EventHandler* EventHandler;
-    // [FieldOffset(0x168)] public float Unk168; // ModelChara.Unknown3 * 0.1f
+    // [FieldOffset(0x168)] private float Unk168; // ModelChara.Unknown3 * 0.1f
     [FieldOffset(0x16C)] public float NameplateOffsetScaleMultiplier; // ModelChara.Unknown6 * 0.1f
     [FieldOffset(0x170)] public Vector3 NameplateOffsetTarget;
     [FieldOffset(0x180)] public Vector3 CameraOffsetTarget;
@@ -94,11 +98,17 @@ public unsafe partial struct GameObject {
     [VirtualFunction(13)]
     public partial void DisableDraw();
 
+    [VirtualFunction(17)]
+    public partial void SetDrawObject(DrawObject* drawObject);
+
     [VirtualFunction(23)]
     public partial DrawObject* GetDrawObject();
 
+    [VirtualFunction(24)]
+    public partial CharacterBase* GetCharacterBase();
+
     [VirtualFunction(26)]
-    public partial void Highlight(ObjectHighlightColor color);
+    public partial void Highlight(ObjectHighlightColor color, bool includeMount = true);
 
     /// <param name="outHandlers">Should point to array that can fit up to 32 pointers.</param>
     /// <returns>Num elements filled.</returns>
@@ -108,34 +118,37 @@ public unsafe partial struct GameObject {
     [VirtualFunction(34)]
     public partial void SetReadyToDraw();
 
-    [VirtualFunction(46)]
+    [VirtualFunction(47)]
     public partial void GetCenterPosition(Vector3* outCenter);
 
-    [VirtualFunction(47)]
+    [VirtualFunction(48)]
     public partial uint GetNameId();
 
     [VirtualFunction(54)]
-    public partial void PositionModified();
+    public partial TargetType GetTargetType();
 
     [VirtualFunction(55)]
+    public partial void PositionModified();
+
+    [VirtualFunction(56)]
     public partial void RotationModified();
 
-    [VirtualFunction(57)]
+    [VirtualFunction(58)]
     public partial bool IsDead();
 
-    [VirtualFunction(58)]
+    [VirtualFunction(59)]
     public partial bool IsNotMounted();
 
-    [VirtualFunction(59)]
+    [VirtualFunction(60)]
     public partial void Terminate();
 
-    [VirtualFunction(60)]
+    [VirtualFunction(61)]
     public partial GameObject* Dtor(byte freeFlags);
 
-    [VirtualFunction(61)]
+    [VirtualFunction(62)]
     public partial bool IsCharacter();
 
-    [VirtualFunction(68)]
+    [VirtualFunction(69)]
     public partial void OnInitialize();
 
     /// <summary>
@@ -145,13 +158,16 @@ public unsafe partial struct GameObject {
     /// <param name="outHitPosition">The output position where the intersection occurs, if any.</param>
     /// <param name="outModelChecked">A boolean output that indicates whether the intersection was checked against the model (<c>true</c>) or approximated via the object's center (<c>false</c>).</param>
     /// <returns><c>true</c> if the ray intersects with the game object; otherwise, <c>false</c>.</returns>
-    [VirtualFunction(69)]
+    [VirtualFunction(70)]
     public partial bool IntersectsRay(Ray* ray, Vector3* outHitPosition, bool* outModelChecked);
+
+    [MemberFunction("E8 ?? ?? ?? ?? 4C 8B F8 B8")]
+    public partial Character.Character* GetAsCharacter();
 
     [MemberFunction("E8 ?? ?? ?? ?? 0F 28 74 24 ?? 80 3D")]
     public partial void SetDrawOffset(float x, float y, float z);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 83 FE 20")]
+    [MemberFunction("E8 ?? ?? ?? ?? 4C 3B FF 75")]
     public partial void SetRotation(float value);
 
     [MemberFunction("E8 ?? ?? ?? ?? 83 4B 70 01")]
@@ -291,6 +307,16 @@ public enum BattleNpcSubKind : byte {
     NpcPartyMember = 9,
 }
 
+public enum TargetType {
+    NonPartyPc = 0,
+    Party = 1,
+    Alliance = 2,
+    Pet = 3,
+    Enemy = 4,
+    Minion = 5,
+    NpcOrObject = 6
+}
+
 [Flags]
 public enum ObjectTargetableFlags : byte {
     IsTargetable = 1 << 1,
@@ -307,4 +333,11 @@ public enum ObjectHighlightColor : byte {
     Orange = 5,
     Magenta = 6,
     Black = 7
+}
+
+[Flags]
+public enum VisibilityFlags : ulong {
+    None = 0,
+    Model = 1ul << 1,
+    Nameplate = 1ul << 11
 }

@@ -1,6 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
-using FFXIVClientStructs.FFXIV.Common.Math;
-
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
 // Client::Graphics::Render::SubView
@@ -8,7 +5,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 public unsafe struct SubView {
     // TODO check and update for 7.2
     [FieldOffset(0x8)] public uint Flags;
-    [FieldOffset(0xC)] public uint Unk;
+    [FieldOffset(0xC)] private uint Unk;
     //[FieldOffset(0x10)] public Rectangle ViewportRegion;
     [FieldOffset(0x10)] public Camera* Camera;
     //[FieldOffset(0x28)] public Texture* RenderTarget_1;

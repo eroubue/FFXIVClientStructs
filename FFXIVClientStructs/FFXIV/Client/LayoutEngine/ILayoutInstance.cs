@@ -1,4 +1,5 @@
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 
 namespace FFXIVClientStructs.FFXIV.Client.LayoutEngine;
@@ -23,11 +24,11 @@ public unsafe partial struct ILayoutInstance {
     [FieldOffset(0x20)] public uint SubId; // for instances that are created as part of prefab; high byte is key for nesting level 1 and so on - max 4 nesting levels supported
     [FieldOffset(0x24)] public int IndexInPool;
     [FieldOffset(0x28)] public byte IndexInPrefab;
+    [BitField<int>(nameof(NestingLevel), 4, 3)]
     [FieldOffset(0x29)] public byte Flags1; // bits0-3: ???, bits4-6: nesting level, bit7: ???
     [FieldOffset(0x2A)] public byte Flags2;
+    [BitField<bool>(nameof(IsActive), 4)]
     [FieldOffset(0x2B)] public byte Flags3;
-
-    public int NestingLevel => (Flags1 >> 4) & 7;
 
     [VirtualFunction(0)]
     public partial ILayoutInstance* Dtor(byte freeFlags);
@@ -117,6 +118,9 @@ public unsafe partial struct ILayoutInstance {
     [VirtualFunction(55)]
     public partial bool WantToBeActive();
 
+    [VirtualFunction(58)]
+    public partial void ApplyStain(ByteColor* stainColorSrgb);
+
     [VirtualFunction(63)]
     public partial void SetActive(bool active);
 
@@ -153,10 +157,10 @@ public unsafe partial struct ILayoutInstance {
     // [VirtualFunction(77)] ...
 }
 
-[StructLayout(LayoutKind.Explicit, Size = 0x2C)]
+[StructLayout(LayoutKind.Explicit, Size = 0x30)]
 public unsafe partial struct Transform {
     [FieldOffset(0x00)] public Vector3 Translation;
-    [FieldOffset(0x0C)] public int Type; // note: this is a padding field that in some contexts is used to store collider type
+    [FieldOffset(0x0C)] public int Type; // This is a padding field that in some contexts is used to store collider type
     [FieldOffset(0x10)] public Quaternion Rotation;
     [FieldOffset(0x20)] public Vector3 Scale;
 
@@ -210,6 +214,7 @@ public enum InstanceType : byte {
     EnvLocation = 47,
     EventRange = 49, // collider in layer 4
     QuestMarker = 51,
+    Timeline = 52,
     CollisionBox = 57, // generic collider
     DoorRange = 58,
     LineVfx = 59,

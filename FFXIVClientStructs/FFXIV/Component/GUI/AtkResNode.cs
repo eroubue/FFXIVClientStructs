@@ -9,8 +9,9 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 // base class for all UI "nodes" which represent elements of the UI
 [GenerateInterop(isInherited: true)]
 [Inherits<AtkEventTarget>]
-[StructLayout(LayoutKind.Explicit, Size = 0xB0)]
-public unsafe partial struct AtkResNode : ICreatable {
+[StructLayout(LayoutKind.Explicit, Size = 0xC0)]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? ?? ?? ?? 33 C0 48 89 41 ?? 66 C7 81", 3, 3)]
+public unsafe partial struct AtkResNode : ICreatable<AtkResNode> {
     [FieldOffset(0x8)] public uint NodeId;
     [FieldOffset(0x10)] public AtkTimeline* Timeline;
 
@@ -28,55 +29,77 @@ public unsafe partial struct AtkResNode : ICreatable {
     [FieldOffset(0x4C)] public float ScaleX;
     [FieldOffset(0x50)] public float ScaleY;
     [FieldOffset(0x54)] public float Rotation; // radians (file is degrees)
-    [FieldOffset(0x58)] public Matrix2x2 Transform;
-    [FieldOffset(0x68)] public float ScreenX;
-    [FieldOffset(0x6C)] public float ScreenY;
+    [FieldOffset(0x60)] public Matrix2x2 Transform;
+    [FieldOffset(0x70)] public float ScreenX;
+    [FieldOffset(0x74)] public float ScreenY;
 
-    [FieldOffset(0x70)] public ByteColor Color;
+    [FieldOffset(0x80)] public ByteColor Color;
 
     // not sure what the _2s are for, the regular ones are loaded from the file
-    [FieldOffset(0x74)] public float Depth;
-    [FieldOffset(0x78)] public float Depth_2;
-    [FieldOffset(0x7C)] public short AddRed;
-    [FieldOffset(0x7E)] public short AddGreen;
-    [FieldOffset(0x80)] public short AddBlue;
-    [FieldOffset(0x82)] public short AddRed_2;
-    [FieldOffset(0x84)] public short AddGreen_2;
-    [FieldOffset(0x86)] public short AddBlue_2;
-    [FieldOffset(0x88)] public byte MultiplyRed;
-    [FieldOffset(0x89)] public byte MultiplyGreen;
-    [FieldOffset(0x8A)] public byte MultiplyBlue;
-    [FieldOffset(0x8B)] public byte MultiplyRed_2;
-    [FieldOffset(0x8C)] public byte MultiplyGreen_2;
-    [FieldOffset(0x8D)] public byte MultiplyBlue_2;
-    [FieldOffset(0x8E)] public byte Alpha_2;
-    [FieldOffset(0x8F)] public byte UnkByte_1;
-    [FieldOffset(0x90)] public ushort Width;
-    [FieldOffset(0x92)] public ushort Height;
-    [FieldOffset(0x94)] public float OriginX;
-    [FieldOffset(0x98)] public float OriginY;
+    [FieldOffset(0x84)] public float Depth;
+    [FieldOffset(0x88)] public float Depth_2;
+    [FieldOffset(0x8C)] public short AddRed;
+    [FieldOffset(0x8E)] public short AddGreen;
+    [FieldOffset(0x90)] public short AddBlue;
+    [FieldOffset(0x92)] public short AddRed_2;
+    [FieldOffset(0x94)] public short AddGreen_2;
+    [FieldOffset(0x96)] public short AddBlue_2;
+    [FieldOffset(0x98)] public byte MultiplyRed;
+    [FieldOffset(0x99)] public byte MultiplyGreen;
+    [FieldOffset(0x9A)] public byte MultiplyBlue;
+    [FieldOffset(0x9B)] public byte MultiplyRed_2;
+    [FieldOffset(0x9C)] public byte MultiplyGreen_2;
+    [FieldOffset(0x9D)] public byte MultiplyBlue_2;
+    [FieldOffset(0x9E)] public byte Alpha_2;
+    [FieldOffset(0x9F)] private byte UnkByte_1;
+    [FieldOffset(0xA0)] public ushort Width;
+    [FieldOffset(0xA2)] public ushort Height;
+    [FieldOffset(0xA4)] public float OriginX;
+    [FieldOffset(0xA8)] public float OriginY;
 
     // asm accesses these fields together so this is one 32bit field with priority+flags
-    [FieldOffset(0x9C)] public ushort Priority;
-    [FieldOffset(0x9E)] public NodeFlags NodeFlags;
-    /// <summary>
-    /// <term>Bit 1 [0x1]</term> Is dirty (has updates to be drawn)<br/>
-    /// <term>Bit 2 [0x2]</term> Is undergoing timeline animation (?)<br/>
-    /// <term>Bit 3 [0x4]</term> Calculate transformation<br/>
-    /// <term>Bit 4 [0x10]</term> Stops rapid cursor navigation Up<br/>
-    /// <term>Bit 5 [0x20]</term> Stops rapid cursor navigation Down<br/>
-    /// <term>Bit 6 [0x40]</term> Stops rapid cursor navigation Left<br/>
-    /// <term>Bit 7 [0x80]</term> Stops rapid cursor navigation Right<br/>
-    /// <term>Bit 9 [0x100]</term> Don't make visible on new timeline label<br/>
-    /// <term>Bits 10-17</term> ClipCount<br/>
-    /// <term>Bit 21 [0x100000]</term> Change CursorType to Clickable on hover<br/>
-    /// <term>Bit 23 [0x400000]</term> Change CursorType to TextInput on hover<br/>
-    /// <term>Bit 24 [0x800000]</term> Use elliptical collision instead of rectangular
-    /// </summary>
-    [FieldOffset(0xA0)] public uint DrawFlags;
+    [FieldOffset(0xAC)] public ushort Priority;
+    [FieldOffset(0xAE)] public NodeFlags NodeFlags;
+    [BitField<bool>(nameof(IsDirty), 0)]
+    // Bit 1: Is undergoing timeline animation (?)
+    // Bit 2: Calculate transformation
+    [BitField<bool>(nameof(IsStoppingRapidCursorNavigationUp), 4)]
+    [BitField<bool>(nameof(IsStoppingRapidCursorNavigationDown), 5)]
+    [BitField<bool>(nameof(IsStoppingRapidCursorNavigationLeft), 6)]
+    [BitField<bool>(nameof(IsStoppingRapidCursorNavigationRight), 7)]
+    // Bit 8: Don't make visible on new timeline label
+    [BitField<byte>(nameof(ClipCount), 9, 8)]
+    [BitField<bool>(nameof(IsClickableCursorOnHover), 20)]
+    [BitField<bool>(nameof(IsTextInputCursorOnHover), 22)]
+    [BitField<bool>(nameof(IsEllipticalCollision), 23)]
+    [FieldOffset(0xB0)] public uint DrawFlags;
+
+    /// <summary> Is dirty (has updates to be drawn) </summary>
+    public partial bool IsDirty { get; set; }
+
+    /// <summary> Stops rapid cursor navigation Up </summary>
+    public partial bool IsStoppingRapidCursorNavigationUp { get; set; }
+
+    /// <summary> Stops rapid cursor navigation Down </summary>
+    public partial bool IsStoppingRapidCursorNavigationDown { get; set; }
+
+    /// <summary> Stops rapid cursor navigation Left </summary>
+    public partial bool IsStoppingRapidCursorNavigationLeft { get; set; }
+
+    /// <summary> Stops rapid cursor navigation Right </summary>
+    public partial bool IsStoppingRapidCursorNavigationRight { get; set; }
+
+    /// <summary> Change CursorType to Clickable on hover </summary>
+    public partial bool IsClickableCursorOnHover { get; set; }
+
+    /// <summary> Change CursorType to TextInput on hover </summary>
+    public partial bool IsTextInputCursorOnHover { get; set; }
+
+    /// <summary> Use elliptical collision instead of rectangular </summary>
+    public partial bool IsEllipticalCollision { get; set; }
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B D8 48 83 C4 ?? 5B C3 33 DB")]
-    public partial void Ctor();
+    public partial AtkResNode* Ctor();
 
     [MemberFunction("48 85 C9 74 14 0F B7 41 40")]
     public partial NodeType GetNodeType();
@@ -84,7 +107,7 @@ public unsafe partial struct AtkResNode : ICreatable {
     [MemberFunction("E8 ?? ?? ?? ?? 45 39 B7")]
     public partial uint GetBaseNodeId();
 
-    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 74 ?? 8B 4E ?? 81 F9")]
+    [MemberFunction("48 85 C9 74 0B 81 79")]
     public partial bool IsDuplicatedNode();
 
     #region Node getters
@@ -147,7 +170,7 @@ public unsafe partial struct AtkResNode : ICreatable {
     [MemberFunction("E8 ?? ?? ?? ?? 8B 4C 35 97")]
     public partial AtkComponentDropDownList* GetAsAtkComponentDropdownList();
 
-    [MemberFunction("E8 ?? ?? ?? ?? 49 89 07 48 8B F8")]
+    [MemberFunction("E8 ?? ?? ?? ?? 49 89 07 48 8B F8 48 85 C0")]
     public partial AtkComponentTab* GetAsAtkComponentTab();
 
     [MemberFunction("E8 ?? ?? ?? ?? 49 89 86 ?? ?? ?? ?? 45 33 C9")]
@@ -296,7 +319,7 @@ public unsafe partial struct AtkResNode : ICreatable {
     [MemberFunction("E8 ?? ?? ?? ?? EB ?? 0F 57 C0 F3 0F 59 C6")]
     public partial float GetRotationDegrees();
 
-    [MemberFunction("E8 ?? ?? ?? ?? EB ?? 8B 41")]
+    [MemberFunction("E8 ?? ?? ?? ?? 4D 8D 7E 28")]
     public partial void SetRotationDegrees(float rotation);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 63 46 30")]
@@ -320,10 +343,10 @@ public unsafe partial struct AtkResNode : ICreatable {
     [MemberFunction("E8 ?? ?? ?? ?? 41 0F 28 C9 8B 87")]
     public partial void SetOrigin(float originX, float originY);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 66 41 3B C4 75")]
+    [MemberFunction("E8 ?? ?? ?? ?? 0F B7 C0 3B C7 74")]
     public partial ushort GetTimelineLabel();
 
-    [MemberFunction("48 85 C9 74 12 48 8B 41 10")]
+    [MemberFunction("E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 48 85 C9 74 ?? 8B D5")]
     public partial void EnableTimeline();
 
     [MemberFunction("E8 ?? ?? ?? ?? 33 FF 39 BD")]

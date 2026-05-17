@@ -3,9 +3,9 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.UI;
 // Client::Game::UI::ContentInterface
 [GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x08)]
-public partial struct ContentInterface {
+public unsafe partial struct ContentInterface {
     [VirtualFunction(0)]
-    public partial void Dtor(byte freeFlag);
+    public partial ContentInterface* Dtor(byte freeFlag);
 
     [VirtualFunction(1)]
     public partial CStringPointer GetName();
@@ -50,7 +50,7 @@ public partial struct ContentInterface {
     public partial bool IsUnlocked();
 
     // [VirtualFunction(15)]
-    // public partial bool Unknown15();
+    // private partial bool Unknown15();
 
     [VirtualFunction(16)]
     public partial bool IsCompleted();
@@ -83,199 +83,202 @@ public partial struct ContentInterface {
     public partial byte GetQueueMaxPlayers();
 
     [VirtualFunction(26)]
-    public partial byte GetTanksPerParty();
+    public partial byte GetQueueMinPlayers(); // ContentMemberType.Unknown16
 
     [VirtualFunction(27)]
-    public partial byte GetHealersPerParty();
+    public partial byte GetTanksPerParty();
 
     [VirtualFunction(28)]
-    public partial byte GetTotalDpsPerParty();
+    public partial byte GetHealersPerParty();
 
     [VirtualFunction(29)]
-    public partial byte GetMeleesPerParty();
+    public partial byte GetTotalDpsPerParty();
 
     [VirtualFunction(30)]
-    public partial byte GetRangedPerParty();
+    public partial byte GetMeleesPerParty();
 
     [VirtualFunction(31)]
-    public partial byte GetPartyCount();
+    public partial byte GetRangedPerParty();
 
     [VirtualFunction(32)]
-    public partial byte GetAlliancePartyCount();
+    public partial byte GetPartyCount();
 
     [VirtualFunction(33)]
-    public partial byte GetQueueMinPlayers();
+    public partial byte GetAlliancePartyCount();
 
-    [VirtualFunction(34)]
-    public partial bool IsRoleIndependent();
+    // [VirtualFunction(34)]
+    // public partial byte Unknown34(); // ContentFinderCondition.Unknown34
 
     [VirtualFunction(35)]
-    public partial bool IsFixedItemLevelSync();
+    public partial bool IsRoleIndependent();
 
     [VirtualFunction(36)]
-    public partial bool IsUnrestrictedPartyAllowed();
+    public partial bool IsFixedItemLevelSync();
 
     [VirtualFunction(37)]
-    public partial bool IsMatchingForAlliancesUnavailable();
+    public partial bool IsUnrestrictedPartyAllowed();
 
     [VirtualFunction(38)]
-    public partial bool IsMemberRequiredInEveryParty();
+    public partial bool IsMatchingForAlliancesUnavailable();
 
     [VirtualFunction(39)]
-    public partial int GetLootModeType();
+    public partial bool IsMemberRequiredInEveryParty();
 
     [VirtualFunction(40)]
-    public partial bool IsAdditionalLootRulesAvailable();
+    public partial int GetLootModeType();
 
     [VirtualFunction(41)]
+    public partial bool IsAdditionalLootRulesAvailable();
+
+    [VirtualFunction(42)]
     public partial bool IsMinimumILAllowed();
 
-    // [VirtualFunction(42)]
-    // public partial bool Unknown42();
+    // [VirtualFunction(43)]
+    // private partial bool Unknown42();
 
-    [VirtualFunction(43)]
+    [VirtualFunction(44)]
     public partial bool IsAllianceRegistrationAllowed();
 
-    // [VirtualFunction(44)]
-    // public partial bool Unknown44();
+    // [VirtualFunction(45)]
+    // private partial bool Unknown44();
 
-    [VirtualFunction(45)]
+    [VirtualFunction(46)]
     public partial uint GetAllianceRegistrationMinPlayers();
 
-    // [VirtualFunction(46)]
-    // public partial bool Unknown46();
-
-    [VirtualFunction(47)]
-    public partial bool IsGrandCompanyRequired();
+    // [VirtualFunction(47)]
+    // private partial bool Unknown46();
 
     [VirtualFunction(48)]
+    public partial bool IsGrandCompanyRequired();
+
+    [VirtualFunction(49)]
     public partial bool IsBattleMentorWithCurrentCertificationOnly();
 
-    // [VirtualFunction(49)]
-    // public partial bool Unknown49();
-
     // [VirtualFunction(50)]
-    // public partial bool Unknown50();
+    // private partial bool Unknown49();
 
-    [VirtualFunction(51)]
-    public partial bool IsRegistrationDataCenterLimited();
+    // [VirtualFunction(51)]
+    // private partial bool Unknown50();
 
     [VirtualFunction(52)]
+    public partial bool IsRegistrationDataCenterLimited();
+
+    [VirtualFunction(53)]
     public partial bool IsExplorerModeAllowed();
 
     /// <return> 1 = Daily, 2 = Weekly </return>
-    [VirtualFunction(53)]
+    [VirtualFunction(54)]
     public partial byte GetRewardResetType();
 
     /// <return> 1 = On Death, 2 = On Start </return>
-    [VirtualFunction(54)]
+    [VirtualFunction(55)]
     public partial byte GetEchoSetting();
 
-    [VirtualFunction(55)]
+    [VirtualFunction(56)]
     public partial byte GetRequiredExVersion();
 
-    [VirtualFunction(56)]
+    [VirtualFunction(57)]
     public partial ushort GetTimeLimit();
 
-    [VirtualFunction(57)]
+    [VirtualFunction(58)]
     public partial ushort GetTimeLimitMax();
 
-    // [VirtualFunction(58)]
-    // public partial byte Unknown58(); // PartyCount
-
-    [VirtualFunction(59)]
-    public partial byte GetContentUICategory();
+    // [VirtualFunction(59)]
+    // private partial byte Unknown58(); // PartyCount
 
     [VirtualFunction(60)]
-    public partial uint GetJournalGenre();
+    public partial byte GetContentUICategory();
 
     [VirtualFunction(61)]
-    public partial bool IsReplacementAllowed();
+    public partial uint GetJournalGenre();
 
     [VirtualFunction(62)]
-    public partial ushort GetTerritoryType();
+    public partial bool IsReplacementAllowed();
 
     [VirtualFunction(63)]
-    public partial bool Unknown63();
+    public partial ushort GetTerritoryType();
 
     [VirtualFunction(64)]
-    public partial bool IsInDutyFinder();
+    private partial bool Unknown63();
 
     [VirtualFunction(65)]
-    public partial bool IsHighEndDuty();
+    public partial bool IsInDutyFinder();
 
     [VirtualFunction(66)]
-    public partial bool IsConsumableItemAllowed();
+    public partial bool IsHighEndDuty();
 
     [VirtualFunction(67)]
-    public partial ushort GetSortKey();
+    public partial bool IsConsumableItemAllowed();
 
     [VirtualFunction(68)]
-    public partial uint GetGoldSaucerRegisterConditionCount();
+    public partial ushort GetSortKey();
 
     [VirtualFunction(69)]
+    public partial uint GetGoldSaucerRegisterConditionCount();
+
+    [VirtualFunction(70)]
     public partial uint GetGoldSaucerRegisterConditionAddonId(int index);
 
-    // [VirtualFunction(70)]
-    // public partial bool Unknown70();
-
     // [VirtualFunction(71)]
-    // public partial bool Unknown71();
+    // private partial bool Unknown70();
 
     // [VirtualFunction(72)]
-    // public partial bool Unknown72();
+    // private partial bool Unknown71();
 
-    [VirtualFunction(73)]
+    // [VirtualFunction(73)]
+    // private partial bool Unknown72();
+
+    [VirtualFunction(74)]
     public partial bool IsOnlyPvPTeamMembers();
 
-    // [VirtualFunction(74)]
-    // public partial bool Unknown74();
-
-    [VirtualFunction(75)]
-    public partial uint GetContentCloseCycle();
+    // [VirtualFunction(75)]
+    // private partial bool Unknown74();
 
     [VirtualFunction(76)]
-    public partial bool IsDutyRecorderAllowed();
+    public partial uint GetContentCloseCycle();
 
     [VirtualFunction(77)]
+    public partial bool IsDutyRecorderAllowed();
+
+    [VirtualFunction(78)]
     public partial bool IsRegistrationHomeWorldLimited();
 
-    // [VirtualFunction(78)]
-    // public partial bool Unknown78();
-
     // [VirtualFunction(79)]
-    // public partial bool Unknown79();
+    // private partial bool Unknown78();
 
     // [VirtualFunction(80)]
-    // public partial bool Unknown80();
+    // private partial bool Unknown79();
 
-    [VirtualFunction(81)]
-    public partial bool IsCurrentUnreal();
+    // [VirtualFunction(81)]
+    // private partial bool Unknown80();
 
     [VirtualFunction(82)]
-    public partial bool IsRegistrationAllowedFromAnyDataCenter();
+    public partial bool IsCurrentUnreal();
 
     [VirtualFunction(83)]
-    public partial uint GetCrystallineConflictGameplayFeatureCount();
+    public partial bool IsRegistrationAllowedFromAnyDataCenter();
 
     [VirtualFunction(84)]
-    public partial uint GetCrystallineConflictGameplayFeatureAddonId(int index);
+    public partial uint GetCrystallineConflictGameplayFeatureCount();
 
     [VirtualFunction(85)]
-    public partial byte GetUnlockType();
+    public partial uint GetCrystallineConflictGameplayFeatureAddonId(int index);
 
     [VirtualFunction(86)]
+    public partial byte GetUnlockType();
+
+    [VirtualFunction(87)]
     public partial uint GetUnlockCriteria();
 
-    // [VirtualFunction(87)]
-    // public partial bool Unknown87();
-
-    [VirtualFunction(88)]
-    public partial byte GetPenaltyTimestampArrayIndex();
+    // [VirtualFunction(88)]
+    // private partial bool Unknown87();
 
     [VirtualFunction(89)]
-    public partial bool IsLimitedTimeBonus();
+    public partial byte GetPenaltyTimestampArrayIndex();
 
     [VirtualFunction(90)]
+    public partial bool IsLimitedTimeBonus();
+
+    [VirtualFunction(91)]
     public partial bool IsPhoenixDownAllowed();
 }

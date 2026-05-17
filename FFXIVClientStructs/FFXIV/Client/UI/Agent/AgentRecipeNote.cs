@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 // Client::UI::Agent::AgentRecipeNote
@@ -8,7 +6,7 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 [Agent(AgentId.RecipeNote)]
 [GenerateInterop]
 [Inherits<AgentInterface>]
-[StructLayout(LayoutKind.Explicit, Size = 0x568)]
+[StructLayout(LayoutKind.Explicit, Size = 0x570)]
 public unsafe partial struct AgentRecipeNote {
 
     [FieldOffset(0x398)] public uint ContextMenuResultItemId;
@@ -48,6 +46,9 @@ public unsafe partial struct AgentRecipeNote {
 
     [MemberFunction("40 55 56 57 48 83 EC 20 80 B9")]
     public partial void SearchRecipe(Utf8String* text, byte a3, bool pushHistory);
+
+    [MemberFunction("E8 ?? ?? ?? ?? 33 ED 84 C0 75")]
+    public partial bool IsNoteBookDivisionUnlocked(uint noteBookDivisionId, int craftType);
 }
 
 [GenerateInterop]

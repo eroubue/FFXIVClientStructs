@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Common.Component.Excel;
 using FFXIVClientStructs.FFXIV.Component.Excel;
 using FFXIVClientStructs.FFXIV.Component.Text;
@@ -23,14 +22,13 @@ public unsafe partial struct RaptureTextModule {
     [FieldOffset(0x520)] public UIModule* UIModule;
     [FieldOffset(0x528)] public TextChecker TextChecker;
     [FieldOffset(0x620)] public ExcelSheet* AddonSheet;
-
+    [FieldOffset(0x628)] public ExcelSheet* AddonTransientSheet;
     // [0] = TempLinkString
     // [1] = <edgecolortype(0)><colortype(0)>
     // [2] = LinkTerminator (<link(0xCE,0,0,0,)>)
     [FieldOffset(0x630), FixedSizeArray] internal FixedSizeArray7<Utf8String> _unkStrings0;
-
     [FieldOffset(0x908)] public StdDeque<TextParameter> LocalTextParameters;
-    // [FieldOffset(0x930)] public StdDeque<TextParameter> ItemRarityParameters; // to format Addon#6
+    [FieldOffset(0x930)] public StdDeque<TextParameter> ItemRarityParameters; // to format Addon#6
 
     // [3] = TempItemRarity
     // [4] = TempItemNameOutput
@@ -51,13 +49,16 @@ public unsafe partial struct RaptureTextModule {
     /// <remarks> Array of 51 (AkatsukiNote row count) ushorts. Mapping AkatsukiNote RowId to AkatsukiNoteString RowId. </remarks>
     [FieldOffset(0xE58)] public ushort* AkatsukiNoteTitleIds;
 
-    [MemberFunction("E8 ?? ?? ?? ?? 4C 8B E0 BA")]
+    [MemberFunction("E9 ?? ?? ?? ?? 80 EB 20")]
     public partial CStringPointer GetAddonText(uint addonId);
+
+    [MemberFunction("E8 ?? ?? ?? ?? 49 8D 4E ?? 48 8B D0 E8 ?? ?? ?? ?? 8B 45")]
+    public partial CStringPointer FormatAddonTextApply(uint addonId, FormatAddonTextApplyMode mode, StdDeque<TextParameter>* localParameters, Utf8String* formatBuffer, Utf8String* normalizationBuffer);
 
     [MemberFunction("E8 ?? ?? ?? ?? EB ?? 44 89 7C 24 ?? 44 89 4C 24")] // FormatAddonText1<int,int,uint>
     public partial CStringPointer FormatAddonText1IntIntUInt(uint addonId, int intParam1, int intParam2, uint uintParam);
 
-    [MemberFunction("E8 ?? ?? ?? ?? EB ?? 3A 56")] // FormatAddonText2<int>
+    [MemberFunction("E8 ?? ?? ?? ?? 49 6B F7")] // FormatAddonText2<int>
     public partial CStringPointer FormatAddonText2Int(uint addonId, int value);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B D8 44 39 7E")] // FormatAddonText2<int,int>
@@ -81,8 +82,26 @@ public unsafe partial struct RaptureTextModule {
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B 4C 24 ?? 48 8D 55 ?? E8 ?? ?? ?? ?? E9")]
     public partial void AddSheetRedirectItemDecoration(Utf8String* sheetName, SheetRedirectFlags flags, int rowId);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 48 8B 4D 80 48 8D 55 60")]
+    [MemberFunction("E8 ?? ?? ?? ?? 48 8B 4D ?? 48 8D 95 ?? ?? ?? ?? E8")]
     public partial void CreateSheetLink(ExcelSheet* sheet, Utf8String* text, int rowId, int colParam);
+
+    /// <summary> Sets global parameters 1, 4, 6 and 65 </summary>
+    [MemberFunction("E8 ?? ?? ?? ?? 48 8D 4D 97 E8 ?? ?? ?? ?? 0F B6 5E 05")]
+    public partial void SetGlobalTempEntity1Utf8(Utf8String* name, int sex, uint objStrId);
+
+    /// <summary> Sets global parameters 1, 4, 6 and 65 </summary>
+    /// <remarks> The caller must ensure the name pointer remains valid until the subsequent formatting call has processed global parameter 1. </remarks>
+    [MemberFunction("E8 ?? ?? ?? ?? 83 EE 16")]
+    public partial void SetGlobalTempEntity1(CStringPointer name, int sex, uint objStrId);
+
+    /// <summary> Sets global parameters 2, 5, 7 and 66 </summary>
+    [MemberFunction("E8 ?? ?? ?? ?? 48 8D 4D 97 E8 ?? ?? ?? ?? 4C 8B 64 24 ??")]
+    public partial void SetGlobalTempEntity2Utf8(Utf8String* name, int sex, uint objStrId);
+
+    /// <summary> Sets global parameters 2, 5, 7 and 66 </summary>
+    /// <remarks> The caller must ensure the name pointer remains valid until the subsequent formatting call has processed global parameter 1. </remarks>
+    [MemberFunction("E8 ?? ?? ?? ?? E8 ?? ?? ?? ?? 3A 85")]
+    public partial void SetGlobalTempEntity2(CStringPointer name, int sex, uint objStrId);
 
     [Flags]
     public enum SheetRedirectFlags {
@@ -93,5 +112,25 @@ public unsafe partial struct RaptureTextModule {
         Collectible = 1 << 3,
         Action = 1 << 4,
         ActionSheet = 1 << 5,
+    }
+
+    public enum FormatAddonTextApplyMode {
+        /// <summary>
+        /// Returns the Addon text as is.
+        /// </summary>
+        Raw = 0,
+
+        /// <summary>
+        /// Formats the Addon text with the given LocalParameters.
+        /// </summary>
+        Formatted = 1,
+
+        /// <summary>
+        /// Formats the Addon text with the given LocalParameters and decodes the following macro (for example for CounterNode, which uses a special font texture):<br/>
+        /// - Wait macros are removed (an internal counter goes up).<br/>
+        /// - NonBreakingSpace macros are replaced with a normal space (0x20: ' ').<br/>
+        /// - Hyphen macros are replaced with a normal hyphen-minus (0x2D: '-').
+        /// </summary>
+        Normalized = 2,
     }
 }

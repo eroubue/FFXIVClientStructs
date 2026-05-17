@@ -1,6 +1,6 @@
 using FFXIVClientStructs.FFXIV.Client.System.Input;
 using FFXIVClientStructs.FFXIV.Client.System.Input.SoftKeyboards;
-using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Common.Component.Excel;
 using TextServiceEvent = FFXIVClientStructs.FFXIV.Client.System.Input.TextServiceInterface.TextServiceEvent;
@@ -13,7 +13,7 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 //   Client::System::Input::TextServiceInterface::TextServiceEvent
 [GenerateInterop(isInherited: true)]
 [Inherits<AtkModuleInterface>, Inherits<AtkExternalInterface>, Inherits<TextServiceEvent>]
-[StructLayout(LayoutKind.Explicit, Size = 0x82A0)]
+[StructLayout(LayoutKind.Explicit, Size = 0x82E0)]
 public unsafe partial struct AtkModule {
     public delegate AtkValue* CallbackHandlerDelegate(AtkModule* thisPtr, AtkValue* returnValue, AtkValue* values, uint valueCount);
 
@@ -21,41 +21,54 @@ public unsafe partial struct AtkModule {
 
     [FieldOffset(0x128)] public AtkStage* AtkStage;
     [FieldOffset(0x130)] internal nint Resources;
-    [FieldOffset(0x1B8)] public AtkFontManager AtkFontManager;
-    [FieldOffset(0x250)] public AtkTextureResourceManager AtkTextureResourceManager;
-    [FieldOffset(0x2A8)] public AtkUnitManager* AtkUnitManager;
-    [FieldOffset(0x2B0)] public AtkInputManager AtkInputManager;
-    [FieldOffset(0x1B50)] public AtkCollisionManager AtkCollisionManager;
-    [FieldOffset(0x1B90)] public AtkArrayDataHolder AtkArrayDataHolder;
-    [FieldOffset(0x1BE0)] public AtkTimerHolder AtkTimerHolder;
-    [FieldOffset(0x1C00)] public AtkSimpleTweenHolder AtkSimpleTweenHolder;
-    [FieldOffset(0x5C08)] public AtkCrestManager AtkCrestManager;
-    [FieldOffset(0x5C50)] public AtkUIColorHolder AtkUIColorHolder;
+    [FieldOffset(0x1D0)] public AtkFontManager AtkFontManager;
+    [FieldOffset(0x268)] public AtkTextureResourceManager AtkTextureResourceManager;
+    [FieldOffset(0x2C0)] public AtkUnitManager* AtkUnitManager;
+    [FieldOffset(0x2C8)] public AtkInputManager AtkInputManager;
+    [FieldOffset(0x1B68)] public AtkCollisionManager AtkCollisionManager;
+    [FieldOffset(0x1BA8)] public AtkArrayDataHolder AtkArrayDataHolder;
+    [FieldOffset(0x1BF8)] public AtkTimerHolder AtkTimerHolder;
+    [FieldOffset(0x1C18)] public AtkSimpleTweenHolder AtkSimpleTweenHolder;
+    [FieldOffset(0x5C20)] public AtkCrestManager AtkCrestManager;
+    [FieldOffset(0x5C68)] public AtkUIColorHolder AtkUIColorHolder;
 
-    [FieldOffset(0x5D00)] public AtkFontCodeModule AtkFontCodeModule;
-    [FieldOffset(0x7280)] public StdVector<nint> CallbackHandlerFunctions; // see CallbackHandlerDelegate
-    [FieldOffset(0x7298)] public AtkModuleEvent* UIModuleEvent;
-    [FieldOffset(0x72A0)] public StdMap<uint, AddonCallbackEntry> AddonCallbackMapping; // Key is UnitBase->Id
-    [FieldOffset(0x72B0)] public AtkMessageBoxManager* AtkMessageBoxManager;
-    [FieldOffset(0x72B8)] public TextService TextService;
-    [FieldOffset(0x72E8)] public AtkTextInput TextInput;
-    [FieldOffset(0x7FA8)] internal Utf8String Unk7FA8;
-    [FieldOffset(0x8010)] internal Utf8String Unk8010;
-    [FieldOffset(0x8078)] internal Utf8String Unk8078;
-    [FieldOffset(0x80E0)] internal Utf8String Unk80E0;
+    [FieldOffset(0x5D18)] public AtkFontCodeModule AtkFontCodeModule;
+    [FieldOffset(0x7298)] public StdVector<nint> CallbackHandlerFunctions; // see CallbackHandlerDelegate
+    [FieldOffset(0x72B0)] public AtkModuleEvent* UIModuleEvent;
+    [FieldOffset(0x72B8)] public StdMap<uint, AddonCallbackEntry> AddonCallbackMapping; // Key is UnitBase->Id
+    [FieldOffset(0x72C8)] public AtkMessageBoxManager* AtkMessageBoxManager;
+    [FieldOffset(0x72D0)] public TextService TextService;
+    [FieldOffset(0x7300)] public AtkTextInput TextInput;
+    [FieldOffset(0x7FE8)] internal Utf8String Unk7FE8;
+    [FieldOffset(0x8050)] internal Utf8String Unk8050;
+    [FieldOffset(0x80B8)] internal Utf8String Unk80B8;
+    [FieldOffset(0x8120)] internal Utf8String Unk8120;
 
     // probably an #IFDEF WINDOWS here or something specifically creating a Steam keyboard.
     // hope they don't add more soft keyboards later!
-    [FieldOffset(0x8150)] public SteamGamepadSoftKeyboard SoftKeyboardDevice;
+    [FieldOffset(0x8190)] public SteamGamepadSoftKeyboard SoftKeyboardDevice;
 
-    [FieldOffset(0x8268), FixedSizeArray(isString: true)] internal FixedSizeArray16<byte> _currentUIScene;
-    [FieldOffset(0x8278), FixedSizeArray(isString: true)] internal FixedSizeArray16<byte> _loadingUIScene;
+    [FieldOffset(0x82A8), FixedSizeArray(isString: true)] internal FixedSizeArray16<byte> _currentUIScene;
+    [FieldOffset(0x82B8), FixedSizeArray(isString: true)] internal FixedSizeArray16<byte> _loadingUIScene;
 
-    [FieldOffset(0x8290)] internal ushort ScreenWidth; // maybe UI dimensions?
-    [FieldOffset(0x8292)] internal ushort ScreenHeight;
-    [FieldOffset(0x8294)] public bool EnableUiDraw;
+    [FieldOffset(0x82D0)] internal ushort ScreenWidth; // maybe UI dimensions?
+    [FieldOffset(0x82D2)] internal ushort ScreenHeight;
+    [FieldOffset(0x82D4)] public bool EnableUiDraw;
 
-    [FieldOffset(0x8298)] public bool EnableUiInput;
+    [FieldOffset(0x82D8)] public bool EnableUiInput;
+    [FieldOffset(0x82D9)] public bool IsHudInitialized;
+
+    [VirtualFunction(44)]
+    public partial AddonStatus GetAddonStatus(uint addonId);
+
+    [VirtualFunction(45)]
+    public partial bool SetAddonDepthLayer(uint addonId, uint depthLayerIndex);
+
+    [VirtualFunction(60)]
+    public partial void Update(float delta);
+
+    [VirtualFunction(65), GenerateStringOverloads]
+    public partial bool OpenMapWithMapLink(CStringPointer mapLink);
 
     [MemberFunction("E8 ?? ?? ?? ?? 44 0F B6 44 24 ?? 8B D3")]
     public partial bool IsTextInputActive();
@@ -63,6 +76,15 @@ public unsafe partial struct AtkModule {
     // CallbackHandlerFunctions[2]
     [MemberFunction("40 56 48 83 EC ?? 48 8B F2 48 8B D1")]
     public partial AtkValue* HandleAddonAgentCallback(AtkValue* returnValue, AtkValue* values, uint valueCount);
+
+    /// <summary>
+    /// Handles the given input data.
+    /// </summary>
+    /// <param name="inputData">The input data to process.</param>
+    /// <param name="isPadMouseModeEnabled">Whether the player has the gamepad mouse emulator active.</param>
+    /// <returns>Flags with two bits. Seen returning one when the input was consumed by a collision node, and zero without.</returns>
+    [MemberFunction("E8 ?? ?? ?? ?? 41 B6 01 40 B5 02")]
+    public partial byte HandleInput(UIInputData* inputData, bool isPadMouseModeEnabled);
 
     [StructLayout(LayoutKind.Explicit, Size = 0x10)]
     public struct AddonCallbackEntry {

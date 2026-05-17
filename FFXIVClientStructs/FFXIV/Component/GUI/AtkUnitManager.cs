@@ -8,7 +8,7 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 [GenerateInterop(isInherited: true)]
 [Inherits<AtkEventListener>]
 [VirtualTable("48 8D 05 ?? ?? ?? ?? 48 8B D9 ?? ?? ?? 48 81 C1 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 15", 3, 43)]
-[StructLayout(LayoutKind.Explicit, Size = 0x9C90)]
+[StructLayout(LayoutKind.Explicit, Size = 0x9CA0)]
 public unsafe partial struct AtkUnitManager {
     [FieldOffset(0x30), FixedSizeArray, CExporterIgnore] internal FixedSizeArray13<AtkUnitList> _depthLayers;
     [FieldOffset(0x30)] public AtkUnitList DepthLayerOneList;
@@ -37,12 +37,36 @@ public unsafe partial struct AtkUnitManager {
     [FieldOffset(0x9178)] public AddonFilter* AddonFilterSystem;
     [FieldOffset(0x9180)] public AddonDragDrop* AddonDragDrop;
     [FieldOffset(0x9188)] public AtkManagedInterface* ManagedScreenFrame;
-
+    [FieldOffset(0x9190)] private AtkResNode* ChatLogFocusNode; // set via a function called in AddonChatLog.OnRefresh, but not sure what for
+    [FieldOffset(0x9198)] public AtkResNode* CursorFocusNode;
+    /// <remarks>
+    /// On scene change, the Hud addons are opened and their ids are stored here.<br/>
+    /// Once all are set up (in <see cref="AtkModule.Update"/>), it calls handler 0 which sets <see cref="AtkModule.IsHudInitialized"/> to <see langword="true"/>.
+    /// </remarks>
+    [FieldOffset(0x91A0), FixedSizeArray] internal FixedSizeArray128<ushort> _hudInitAddonIds;
     [FieldOffset(0x92A0)] private AtkResNode Unk92A0;
-    [FieldOffset(0x9350)] public Size LastScreenSize;
+    [FieldOffset(0x9360)] public Size LastScreenSize;
+    [FieldOffset(0x9368)] public float LastScreenSizeScale;
+    [FieldOffset(0x936C)] public float HUDScaleDefault; // always 1.0f?!
+    /// <remarks> Controlled by ConfigOption <c>UiBaseScale</c> (also settable via <c>/uiscale</c>). </remarks>
+    [FieldOffset(0x9370)] public float UiBaseScale;
+    /// <remarks>
+    /// Used by addons ScreenText, ChatLog (for the auto-translate popup), MiniTalkPlayer.<br/>
+    /// Multiplied by g_GlobalUIScale.<br/>
+    /// Might need a resolution or scene change to be applied in opened addons.
+    /// </remarks>
+    [FieldOffset(0x9374)] public float ScreenTextBaseScale;
+    /// <remarks> Key is DepthLayer of the UnitBase. </remarks>
+    [FieldOffset(0x9378), FixedSizeArray] internal FixedSizeArray13<ushort> _nextDrawOrderIndexes;
+    /// <remarks> Count of non-zero entries in <see cref="HudInitAddonIds"/>. </remarks>
+    [FieldOffset(0x9392)] public short NumHudInitAddonIds;
 
-    // [FieldOffset(0x9388), FixedSizeArray] internal FixedSizeArray48<Unk9388Struct> Unk9388;
-    [FieldOffset(0x9C88)] public AtkUnitManagerFlags Flags;
+    [FieldOffset(0x9398), FixedSizeArray] internal FixedSizeArray48<HudAnchoringInfo> _hudAnchoringTable;
+    [FieldOffset(0x9C98)] public AtkUnitManagerFlags Flags;
+    [FieldOffset(0x9C99)] private byte Flags2;
+
+    [VirtualFunction(7)]
+    public partial void GetAddonCollision(AddonCollision* collisionInfo, short x, short y);
 
     [VirtualFunction(8)]
     public partial bool SetAddonVisibility(ushort addonId, bool visible);
@@ -55,6 +79,18 @@ public unsafe partial struct AtkUnitManager {
 
     [VirtualFunction(11)]
     public partial void AddonRequestUpdateById(ushort addonId, NumberArrayData** numberArrayData, StringArrayData** stringArrayData, bool forced);
+
+    [VirtualFunction(24)]
+    public partial void ToggleUi(UiFlags flags, bool show, bool disableTransition, bool a5 = false);
+
+    [VirtualFunction(25)]
+    public partial bool IsUiFlagsSet(UiFlags flags);
+
+    [VirtualFunction(39)]
+    public partial bool ShouldApplyUiBaseScale(AtkUnitBase* addon);
+
+    [VirtualFunction(40)]
+    public partial bool ShouldApplyScreenTextBaseScale(AtkUnitBase* addon);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B F8 41 B0 01"), GenerateStringOverloads]
     public partial AtkUnitBase* GetAddonByName(CStringPointer name, int index = 1);
@@ -75,29 +111,45 @@ public unsafe partial struct AtkUnitManager {
     [MemberFunction("E8 ?? ?? ?? ?? 40 B5 ?? 48 83 C3")]
     public partial bool SetAddonDepthLayer(ushort id, uint depthLayerIndex);
 
-    public enum AddonStatus {
-        NotLoaded = 0,
+    [MemberFunction("E8 ?? ?? ?? ?? 0F 28 CE 48 8B CB E8 ?? ?? ?? ?? 48 8B CB E8 ?? ?? ?? ?? 0F 28 CE")]
+    public partial void UpdateCursor();
 
-        Shown = 1 << 2,
-        Hidden = 1 << 3,
+    // not sure how this works
+    [StructLayout(LayoutKind.Explicit, Size = 0x30)]
+    public struct HudAnchoringInfo {
+        [FieldOffset(0x00)] public AtkUnitBase* AtkUnitBase;
+        [FieldOffset(0x08)] public uint NameHash;
+        [FieldOffset(0x0C)] public AlignmentType AlignmentType; // 9-slice anchor point, i guess
+        /// <remarks> X/Y coordinates between 0 and 1, depending on <see cref="AlignmentType"/>. </remarks>
+        [FieldOffset(0x10)] public float NormalizedCoordinate;
     }
+}
 
-    // [StructLayout(LayoutKind.Explicit, Size = 0x30)]
-    // public struct Unk9388Struct {
-    //     [FieldOffset(0x00)] public AtkUnitBase* AtkUnitBase;
-    //     [FieldOffset(0x08)] public uint NameHash;
-    // }
+public enum AddonStatus {
+    NotLoaded = 0,
+
+    Shown = 1 << 2,
+    Hidden = 1 << 3,
 }
 
 [Flags]
 public enum AtkUnitManagerFlags : byte {
-    None = 0x00,
-    Unk01 = 0x01,
+    None = 0,
+    /// <summary> This flag is temporarily set when any AtkUnitList was modified. Cleared in UpdateDrawOrderIndexes. </summary>
+    UnitListsChanged = 0x01,
+    /// <summary> This flag is temporarily set to call AtkModule CallbackHandler 0, which sets <see cref="AtkModule.IsHudInitialized"/> to <see langword="true"/>. </summary>
     Unk02 = 0x02,
     UiHidden = 0x04,
     Unk08 = 0x08,
     Unk10 = 0x10,
-    Unk20 = 0x20,
+    /// <remarks> <see cref="RaptureAtkModule.UIScene"/> == <see cref="GameUIScene.GameMain"/> </remarks>
+    InGame = 0x20,
     Unk40 = 0x40,
     Unk80 = 0x80,
+}
+
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe struct AddonCollision {
+    [FieldOffset(0x00)] public AtkUnitBase* UnitBase;
+    [FieldOffset(0x08)] public AtkCollisionNode* CollisionNode;
 }

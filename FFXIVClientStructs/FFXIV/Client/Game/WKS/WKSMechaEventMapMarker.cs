@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace FFXIVClientStructs.FFXIV.Client.Game.WKS;
 
@@ -19,5 +18,5 @@ public struct WKSMechaEventMapMarker {
     [FieldOffset(0xC4)] public byte Type;
     [FieldOffset(0xC5)] public byte Flags;
     [FieldOffset(0xC6)] public byte MapMarkerDataFlags;
-    [FieldOffset(0xC7)] public byte UnkC7;
+    [FieldOffset(0xC7)] private byte UnkC7;
 }

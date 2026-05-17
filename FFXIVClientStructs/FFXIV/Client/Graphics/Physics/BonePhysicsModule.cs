@@ -24,4 +24,16 @@ public unsafe partial struct BonePhysicsModule {
     [FieldOffset(0x98)] public Skeleton* Skeleton;
     [FieldOffset(0xA0)] public BoneSimulators BoneSimulators;
     [FieldOffset(0x190), FixedSizeArray] internal FixedSizeArray5<Pointer<ResourceHandle>> _bonePhysicsResourceHandles;
+    [FieldOffset(0x1B8)] public float FrameDeltaTime;
+    [FieldOffset(0x578)] public float OverrideSimulationTime;
+    /// <remarks> If true, returns OverrideSimulationTime when GetSimulationTime is called and FrameDeltaTime is above ~0.01667 (60 FPS.) </remarks>
+    [FieldOffset(0x588)] public bool UseOverrideSimulationTime;
+
+    /// <summary> Used to set BoneSimulator.SimulationTimeInv, and in turn calls GetSimulationTime. </summary>
+    [MemberFunction("E8 ?? ?? ?? ?? 0F 2F C6 76 ?? 48 8B CE")]
+    public partial float GetSimulationTimeInv();
+
+    /// <summary> Limits the returned value to 60 FPS, used to set BoneSimulator.SimulationTime. </summary>
+    [MemberFunction("E8 ?? ?? ?? ?? F3 0F 5E F0 F3 0F 11 43")]
+    public partial float GetSimulationTime();
 }

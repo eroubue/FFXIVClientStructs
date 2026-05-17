@@ -13,7 +13,8 @@ public unsafe partial struct Control {
     [FieldOffset(0x00)] public CameraManager CameraManager;
     [FieldOffset(0x190)] public TargetSystem TargetSystem;
 
-    [FieldOffset(0x7633)] public bool IsWalking;
+    [FieldOffset(0x7518)] public bool IsWalkingDuringAutorun;
+    [FieldOffset(0x7637)] public bool IsWalking;
     [FieldOffset(0x7698)] public uint LocalPlayerEntityId;
     [FieldOffset(0x76A0)] public BattleChara* LocalPlayer;
     [FieldOffset(0x76B0)] public Matrix4x4 ViewProjectionMatrix;
@@ -29,12 +30,12 @@ public unsafe partial struct Control {
     /// <returns>See <see cref="FlightAllowedStatus"/></returns>
     [MemberFunction("E8 ?? ?? ?? ?? 85 C0 74 ?? 32 C0 48 83 C4 38")]
     public static partial FlightAllowedStatus GetFlightAllowedStatus();
-    public enum FlightAllowedStatus : int {
+    public enum FlightAllowedStatus {
         CanFly = 0,
         Unk1 = 1, // something with certain territories
-        Unk2 = 2, // UIState.Instance() + 0x184C5 != 0
+        Unk2 = 2, // UIState.Instance() + 0x1A21D != 0
         NotMounted = 3,
-        MountedButCannotFly = 4, // !(PlayerState.Instance() + 0x5D1)
+        MountedButCannotFly = 4, // !PlayerState.CanFly
         IncompleteMountFlyingConditionQuest = 5,
         DefaultCase = 7,
         PlayerOrMountNull = 8

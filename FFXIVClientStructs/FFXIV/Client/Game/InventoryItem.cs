@@ -7,7 +7,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Game;
 [GenerateInterop(isInherited: true)]
 [VirtualTable("66 89 51 0C 48 8D 05", 7)]
 [StructLayout(LayoutKind.Explicit, Size = 0x48)]
-public unsafe partial struct InventoryItem : ICreatable {
+public unsafe partial struct InventoryItem : ICreatable<InventoryItem> {
     [FieldOffset(0x08)] public InventoryType Container;
     [FieldOffset(0x0C)] public short Slot;
     /// <summary>
@@ -42,10 +42,10 @@ public unsafe partial struct InventoryItem : ICreatable {
     }
 
     [MemberFunction("E8 ?? ?? ?? ?? 33 C0 48 8D 4B 58")]
-    public partial void Ctor();
+    public partial InventoryItem* Ctor();
 
     [VirtualFunction(0)]
-    public partial void Dtor(byte freeFlags);
+    public partial InventoryItem* Dtor(byte freeFlags);
 
     /// <summary>Copies the values from the other InventoryItem and, if it's symbolic, resolves its linked item.</summary>
     [VirtualFunction(1)]
@@ -162,6 +162,12 @@ public unsafe partial struct InventoryItem : ICreatable {
     public partial byte GetMateriaGrade(byte materiaSlot);
 
     /// <summary>Gets the materia count from the original InventoryItem or itself if not symbolic.</summary>
-    [MemberFunction("E8 ?? ?? ?? ?? 45 0F B6 7D")]
+    [MemberFunction("E8 ?? ?? ?? ?? 0F B6 E8 83 FD")]
     public partial byte GetMateriaCount();
+
+    [MemberFunction("E8 ?? ?? ?? ?? 80 7F 5E 01")]
+    public static partial uint GetParameterValue(uint baseParamRowId, InventoryItem* inventoryItem, bool includeMateria, bool checkHQ, bool checkPvPCharacterFlag, bool checkPvPItemFlag);
+
+    [MemberFunction("E8 ?? ?? ?? ?? 66 89 46 12")]
+    public static partial uint GetParameterMaxValue(uint baseParamRowId, [CExporterExcel("Item")] void* itemRowData);
 }

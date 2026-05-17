@@ -7,7 +7,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 //     Client::Graphics::ReferencedClassBase
 [GenerateInterop]
 [Inherits<ReferencedClassBase>]
-[StructLayout(LayoutKind.Explicit, Size = 0x158)]
+[StructLayout(LayoutKind.Explicit, Size = 0x180)]
 public unsafe partial struct Model {
     [FieldOffset(0x18)] public Model* Previous;
     [FieldOffset(0x20)] public Model* Next;
@@ -28,12 +28,12 @@ public unsafe partial struct Model {
     [FieldOffset(0xAC)] public uint EnabledAttributeIndexMask;
     [FieldOffset(0xC8)] public uint EnabledShapeKeyIndexMask;
 
-    [FieldOffset(0xE8)] public uint SlotIndex;
+    [FieldOffset(0x118)] public uint SlotIndex;
 
     public ReadOnlySpan<Pointer<Material>> MaterialsSpan
         => new(Materials, MaterialCount);
 
 
-    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 75 ?? 48 8B 07 48 8B CF FF 50 ?? 32 C0")]
+    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 75 29 48 8B 13")]
     public partial bool ModelDrawInit(ModelResourceHandle* mdlHandle, ModelRenderer.Callback* renderModelCallback, ModelRenderer.Callback* renderMaterialCallback);
 }

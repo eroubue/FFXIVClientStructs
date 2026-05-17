@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -28,7 +28,16 @@
     
     <!-- GitInfo generator -->
     <ThisAssemblyNamespace>FFXIVClientStructs</ThisAssemblyNamespace>
+
+    <!-- Overide assembly version -->
+    <GitVersion>false</GitVersion>
   </PropertyGroup>
+
+  <Target Name="PopulateInfo" DependsOnTargets="GitVersion" BeforeTargets="GetAssemblyVersion">
+    <PropertyGroup>
+      <AssemblyVersion>7.50.1.$(GitCommits)</AssemblyVersion>
+    </PropertyGroup>
+  </Target>
 
   <PropertyGroup Condition="'$(IsDocsBuild)' == 'true'">
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -44,9 +53,9 @@
     <CompilerVisibleProperty Include="InteropGenerator_InteropNamespace" />
     <InternalsVisibleTo Include="CExporter" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="GitInfo" Version="3.3.5">
+    <PackageReference Include="GitInfo" Version="3.6.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

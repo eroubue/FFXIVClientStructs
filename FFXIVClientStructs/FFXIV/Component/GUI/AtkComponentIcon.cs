@@ -11,7 +11,7 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 [GenerateInterop]
 [Inherits<AtkComponentBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x138)]
-public unsafe partial struct AtkComponentIcon : ICreatable {
+public unsafe partial struct AtkComponentIcon : ICreatable<AtkComponentIcon> {
     [FieldOffset(0xC0)] public uint IconId;
     [FieldOffset(0xC4)] public IconSubFolder IconSubFolder;
     [FieldOffset(0xC8)] public AtkUldAsset* Texture;
@@ -27,7 +27,7 @@ public unsafe partial struct AtkComponentIcon : ICreatable {
     [FieldOffset(0x130)] public IconComponentFlags Flags;
 
     [MemberFunction("45 33 C0 C7 81 ?? ?? ?? ?? ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 4C 89 41 ?? ?? ?? ?? BA")]
-    public partial void Ctor();
+    public partial AtkComponentIcon* Ctor();
 
     [MemberFunction("E8 ?? ?? ?? ?? 8D 4D 12")]
     public partial bool LoadIcon(uint iconId);
@@ -73,20 +73,20 @@ public unsafe partial struct AtkComponentIcon : ICreatable {
     [MemberFunction("E8 ?? ?? ?? ?? C1 EE ?? 41 B8")]
     public partial void SetHasSecondDyeChannel(bool enabled);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 32 D2 45 8B C4")]
+    [MemberFunction("E8 ?? ?? ?? ?? 33 D2 48 8B CF E8 ?? ?? ?? ?? B2 ?? EB")]
     public partial void SetIsMacro(bool enabled);
 
     [MemberFunction("E8 ?? ?? ?? ?? C1 EF 08 45 33 C0")]
     public partial void SetIsGlamoured(bool enabled);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 41 83 FD 45")]
+    [MemberFunction("E8 ?? ?? ?? ?? 33 D2 48 8B CF E8 ?? ?? ?? ?? 8D 45")]
     public partial void SetIsRecipe(bool enabled);
 
     [MemberFunction("44 8B 89 ?? ?? ?? ?? 4C 8B D1 41 8B C1")]
     public partial void SetComboLevel(bool enable, byte level = 0);
 
     // [MemberFunction("E8 ?? ?? ?? ?? 48 8B 06 80 88")]
-    // public partial void SetUnk8192(bool enabled);
+    // private partial void SetUnk8192(bool enabled);
 
     [MemberFunction("E8 ?? ?? ?? ?? 45 33 F6 FF C6")]
     public partial void SetOuterResNode(AtkResNode* node);
@@ -125,7 +125,7 @@ public enum IconComponentFlags : uint {
     IsRecipe = 1 << 8,
     IsIconLoading = 1 << 9,
     IsBeingDragged = 1 << 10,
-    Unk2048 = 1 << 11,
+    Unk2048 = 1 << 11, // overrides DrawOrderIndex with one from RaptureAtkUnitManager
     IsDisabled = 1 << 12, // for example due to casting or having a window open that disables actions
     Unk8192 = 1 << 13,
 }

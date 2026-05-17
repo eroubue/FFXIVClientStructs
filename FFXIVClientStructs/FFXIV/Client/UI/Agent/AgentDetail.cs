@@ -12,6 +12,9 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 public unsafe partial struct AgentDetail {
     [FieldOffset(0x30)] public InfoProxyDetail* InfoProxyDetail;
 
+    // If true, syncs real data (e.g. OnlineStatus) to the agent for proper display in addons (e.g. SocialDetailA)
+    [FieldOffset(0x40)] public bool ShouldUpdate;
+
     // Don't use these, as they are probably used for SocialDetail.
     // See functions in PlayerState if you want to check these.
     [FieldOffset(0x41)] internal bool IsBattleMentor;
@@ -34,5 +37,5 @@ public unsafe partial struct AgentDetail {
     /// Can be 0, but will open slightly off-center.
     /// </param>
     [MemberFunction("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? BF")]
-    public partial void OpenForCharacterData(InfoProxyCommonList.CharacterData* characterData, InfoProxyDetail.UpdateDataPacket* updateDataPacket = null, int ownerAddonId = 0);
+    public partial void OpenForCharacterData(InfoProxyCommonList.CharacterData* characterData, InfoProxyDetail.DetailUpdateData* updateDataPacket = null, int ownerAddonId = 0);
 }

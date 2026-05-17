@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
@@ -6,7 +5,6 @@ namespace FFXIVClientStructs.FFXIV.Client.UI;
 // Client::UI::AddonBannerEditor
 //   Component::GUI::AtkUnitBase
 //     Component::GUI::AtkEventListener
-// ctor "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 48 8B D9 E8 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 8B CB 48 89 03 E8 ?? ?? ?? ?? 48 8B D0 48 8D 8B ?? ?? ?? ?? E8 ?? ?? ?? ?? 33 ED 48 8D BB"
 [Addon("BannerEditor")]
 [GenerateInterop]
 [Inherits<AtkUnitBase>]
@@ -15,12 +13,6 @@ public unsafe partial struct AddonBannerEditor {
     [FieldOffset(0x238)] public PreviewController PreviewController;
     /// <remarks> [0] Preset, [1] Background, [2] Frame, [3] Accent, [4] Pose, [5] Expression </remarks>
     [FieldOffset(0x2F0), FixedSizeArray] internal FixedSizeArray6<DropdownEntry> _dropdowns;
-    [FieldOffset(0x2F0), Obsolete("Use Dropdowns[0].Dropdown")] public AtkComponentDropDownList* PresetDropdown;
-    [FieldOffset(0x310), Obsolete("Use Dropdowns[1].Dropdown")] public AtkComponentDropDownList* BackgroundDropdown;
-    [FieldOffset(0x330), Obsolete("Use Dropdowns[2].Dropdown")] public AtkComponentDropDownList* FrameDropdown;
-    [FieldOffset(0x350), Obsolete("Use Dropdowns[3].Dropdown")] public AtkComponentDropDownList* AccentDropdown;
-    [FieldOffset(0x370), Obsolete("Use Dropdowns[4].Dropdown")] public AtkComponentDropDownList* PoseDropdown;
-    [FieldOffset(0x390), Obsolete("Use Dropdowns[5].Dropdown")] public AtkComponentDropDownList* ExpressionDropdown;
 
     [FieldOffset(0x3D0), FixedSizeArray] internal FixedSizeArray15<Utf8String> _filterNames;
     [FieldOffset(0x9E8)] public AtkComponentCheckBox* PlayAnimationCheckbox;

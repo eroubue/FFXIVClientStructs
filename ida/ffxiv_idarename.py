@@ -1,7 +1,7 @@
 # current exe version: 2020.12.29.0000.0000
 # @category __UserScripts
 # @menupath Tools.Scripts.ffxiv_idarename
-# @runtime Jython
+# @runtime PyGhidra
 
 from __future__ import print_function
 import os
@@ -201,6 +201,7 @@ if api is None:
         import idc  # noqa
         import idautils  # noqa
         import ida_funcs  # noqa
+        import ida_bytes  # noqa
     except ImportError:
         print("Warning: Unable to load IDA")
     else:
@@ -237,6 +238,8 @@ if api is None:
 
             def set_addr_name(self, ea, name):
                 # print("{0} {1}".format(ea, name))
+                if ida_bytes.get_item_head(ea) != ea:
+                    return True
                 result = idc.set_name(ea, name)
                 return bool(result)
 
@@ -327,6 +330,10 @@ if api is None:
     except ImportError:
         print("Warning: Unable to load Ghidra")
     else:
+        def toAddr(offset): # noqa
+            # type: (int) -> Address
+            return currentProgram.getAddressFactory().getDefaultAddressSpace().getAddress(offset) # noqa
+
         # noinspection PyUnresolvedReferences
         class GhidraApi(BaseApi):
             @property

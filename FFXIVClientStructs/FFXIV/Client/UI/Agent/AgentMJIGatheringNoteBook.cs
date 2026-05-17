@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 // Client::UI::Agent::AgentMJIGatheringNoteBook
@@ -32,7 +30,7 @@ public struct AgentMJIGatheringNoteBookData {
         [FieldOffset(0x00)] public ushort Radius;
         [FieldOffset(0x02)] public short X;
         [FieldOffset(0x04)] public short Y;
-        [FieldOffset(0x06)] public byte Unknown2; // from the sheet
+        [FieldOffset(0x06)] private byte Unknown2; // from the sheet
 
         [FieldOffset(0x08)] public uint ItemId;
         [FieldOffset(0x0C)] public byte Sort;

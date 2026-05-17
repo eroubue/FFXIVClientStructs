@@ -1,5 +1,5 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using static FFXIVClientStructs.FFXIV.Common.Configuration.ConfigBase;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -13,7 +13,9 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 [Inherits<AgentInterface>, Inherits<ChangeEventInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x3888)]
 public unsafe partial struct AgentItemSearch {
+    [FieldOffset(0x90)] public InfoProxyItemSearch* InfoProxyItemSearch;
     [FieldOffset(0x98)] public StringHolder* StringData;
+
     // [FieldOffset(0xA2C), FixedSizeArray] internal FixedSizeArray100<uint> _unkUints;
     [FieldOffset(0xA29)] public bool ListingPageLoaded;
     [FieldOffset(0xBBC), FixedSizeArray] internal FixedSizeArray100<uint> _listingPageItemIds;
@@ -31,9 +33,9 @@ public unsafe partial struct AgentItemSearch {
 
     [StructLayout(LayoutKind.Explicit, Size = 0x98)]
     public struct StringHolder {
-        // [FieldOffset(0x10)] public int Unk90Size;
+        // [FieldOffset(0x10)] private int Unk90Size;
         [FieldOffset(0x28)] public Utf8String SearchParam;
-        // [FieldOffset(0x90)] public nint Unk90Ptr;
+        // [FieldOffset(0x90)] private nint Unk90Ptr;
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 0x20)]

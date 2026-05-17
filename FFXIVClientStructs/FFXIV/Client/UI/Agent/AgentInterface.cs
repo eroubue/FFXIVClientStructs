@@ -1,4 +1,4 @@
-using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitManager;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using AtkEventInterface = FFXIVClientStructs.FFXIV.Component.GUI.AtkModuleInterface.AtkEventInterface;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -10,15 +10,18 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 [Inherits<AtkEventInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x28)]
 public unsafe partial struct AgentInterface {
-    [FieldOffset(0x08)] private bool Unk8; // seen in AtkModule.HandleAddonCallback
     [FieldOffset(0x10)] public UIModuleInterface* UIModuleInterface;
+    [FieldOffset(0x18)] public AtkEventInterface* OpenerEventInterface;
     [FieldOffset(0x20)] public uint AddonId;
 
     [VirtualFunction(2)]
-    public partial void Dtor(bool free);
+    public partial AgentInterface* Dtor(byte freeFlags);
 
     [VirtualFunction(3)]
     public partial void Show();
+
+    [VirtualFunction(4)]
+    public partial void ShowFromLua(int id, int* args, long argCount);
 
     [VirtualFunction(5)]
     public partial void Hide();
@@ -40,7 +43,7 @@ public unsafe partial struct AgentInterface {
     public partial uint GetAddonId();
 
     [VirtualFunction(10)]
-    public partial void OnGameEvent(GameEvent gameEvent);
+    public partial void OnGameEvent(AgentGameEvent gameEvent);
 
     [VirtualFunction(11)]
     public partial void OnLevelChange(byte classJobId, ushort level);
@@ -51,7 +54,7 @@ public unsafe partial struct AgentInterface {
     [MemberFunction("E8 ?? ?? ?? ?? 44 85 FF")]
     public partial AgentInterface* GetAgentByInternalId(AgentId agentId);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 44 0F B6 F3 33 DB")]
+    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 EB 31")]
     public partial bool IsAddonReady();
 
     [MemberFunction("E8 ?? ?? ?? ?? 45 84 ED 74 1A")]
@@ -60,7 +63,7 @@ public unsafe partial struct AgentInterface {
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B 53 ?? 48 8B 82")]
     public partial void HideAddon();
 
-    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 74 05 41 B4 01")]
+    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 74 ?? 45 33 C9 8D 4D")]
     public partial bool IsAddonShown();
 
     [MemberFunction("E8 ?? ?? ?? ?? 84 C0 74 1A 49 8B CF")]
@@ -71,16 +74,16 @@ public unsafe partial struct AgentInterface {
 
     [MemberFunction("E9 ?? ?? ?? ?? 45 33 C9 41 B0 ?? 33 D2")]
     public partial bool FocusAddon();
+}
 
-    public enum GameEvent {
-        LoggedIn,
-        LoadingEnded, // UI shown
-        LoadingStarted, // UI hidden
-        LoggedOut,
-        Unk4,
-        Unk5, // Entering Duty?
-        Unk6, // Entering Duty?
-        Unk7, // Leaving Duty?
-        Unk8
-    }
+public enum AgentGameEvent {
+    LoggedIn,
+    LoadingEnded, // UI shown
+    LoadingStarted, // UI hidden
+    LoggedOut,
+    Unk4,
+    Unk5, // Entering Duty?
+    Unk6, // Entering Duty?
+    Unk7, // Leaving Duty?
+    Unk8
 }

@@ -20,15 +20,6 @@ public unsafe partial struct CharacterBase {
     public const int PathBufferSize = 260;
     public const int MaterialsPerSlot = 10;
 
-    [Flags]
-    public enum StateFlag : ulong {
-        VisorToggled = 0x00_00_00_00_40,
-        VisorChanging = 0x00_00_00_00_80,
-        HasUmbrella = 0x00_00_01_00_00,
-        VieraEarsHidden = 0x00_80_00_00_00,
-        VieraEarsChanging = 0x01_00_00_00_00
-    }
-
     [FieldOffset(0x90)] public StateFlag StateFlags;
     [FieldOffset(0x9C)] public int SlotCount; // model slots
     [FieldOffset(0xA0)] public Skeleton* Skeleton; // Client::Graphics::Render::Skeleton
@@ -37,6 +28,49 @@ public unsafe partial struct CharacterBase {
 
     [FieldOffset(0xD8)] public Attach Attach;
     [FieldOffset(0x150)] public void* PostBoneDeformer; // Client::Graphics::Scene::PostBoneDeformer ptr
+
+    [FieldOffset(0x158)] public BonePhysicsModule* BonePhysicsModule; // Client::Graphics::Physics::BonePhysicsModule ptr
+    [FieldOffset(0x160)] public BoneKineDriverModule* BoneKineDriverModule;
+
+    [FieldOffset(0x178)] public ModelRenderer.Callback RenderModelCallback;
+    [FieldOffset(0x198)] public ModelRenderer.Callback RenderMaterialCallback;
+    [FieldOffset(0x1B8)] private ModelRenderer.Callback UnkCallback3;
+
+    [FieldOffset(0x224)] public float VfxScale;
+    [FieldOffset(0x270)] public ConstantBuffer* CharacterDataCBuffer; // Size has been observed to be 0xB0, contents may be InstanceParameter
+    [FieldOffset(0x278)] private ConstantBuffer* UnkCBuffer; // Size is also 0xB0
+
+    [FieldOffset(0x288)] public Texture** ColorTableTextures; // each one corresponds to a material, size = SlotCount * MaterialsPerSlot
+
+    [FieldOffset(0x290)] public Vector4 Tint;
+
+    [FieldOffset(0x2E0)] public float WeatherWetness;  // Set to 1.0f when raining and not covered or umbrella'd
+    [FieldOffset(0x2E4)] public float SwimmingWetness; // Set to 1.0f when in water
+    [FieldOffset(0x2E8)] public float WetnessDepth;    // Set to ~character height in GPose and higher values when swimming or diving.
+    [FieldOffset(0x2EC)] public float ForcedWetness;   // Set by vfunc 51 when using GPose, gets set to 0 in UpdateWetness every frame.
+
+    // next few fields are used temporarily when loading the render object and cleared after load
+    [FieldOffset(0x2F8)] public uint HasModelInSlotLoaded; // tracks which slots have loaded models into staging
+
+    [FieldOffset(0x2FC)] public uint HasModelFilesInSlotLoaded; // tracks which slots have loaded materials, etc into staging
+
+    [FieldOffset(0x300)] public void* TempData; // struct with temporary data (size >= 0x88)
+
+    [FieldOffset(0x308)] public SlotStagingArea* PerSlotStagingArea;
+
+    [FieldOffset(0x350)] public MaterialResourceHandle** Materials; // size = SlotCount * MaterialsPerSlot
+
+    [FieldOffset(0x358)] public void* EID; // Client::System::Resource::Handle::ElementIdResourceHandle - EID file for base skeleton
+
+    [FieldOffset(0x360)] public void** IMCArray; // array of Client::System::Resource::Handle::ImageChangeDataResourceHandle ptrs size = SlotCount - IMC file for model in slot
+
+    [FieldOffset(0x3D8), FixedSizeArray] internal FixedSizeArray5<SkeletonAnimationContainer> _skeletonAnimationContainers; // tentative name
+
+    [FieldOffset(0x940)] public SkeletonResourceHandle* MaterialAnimationSkeleton;
+
+    [FieldOffset(0x948)] public ResourceHandle** MaterialAnimationPacks;
+
+    [FieldOffset(0x958)] public byte AnimationVariant; // the "a%04d" part in "%s/animation/a%04d/%s/%s.pap" in LoadAnimation
 
     public bool IsChangingVisor {
         get => StateFlags.HasFlag(StateFlag.VisorChanging);
@@ -63,53 +97,9 @@ public unsafe partial struct CharacterBase {
         set => StateFlags = value ? StateFlags | StateFlag.VieraEarsChanging : StateFlags & ~StateFlag.VieraEarsChanging;
     }
 
-    [FieldOffset(0x158)] public BonePhysicsModule* BonePhysicsModule; // Client::Graphics::Physics::BonePhysicsModule ptr
-    [FieldOffset(0x160)] public BoneKineDriverModule* BoneKineDriverModule;
-
-    [FieldOffset(0x178)] public ModelRenderer.Callback RenderModelCallback;
-    [FieldOffset(0x198)] public ModelRenderer.Callback RenderMaterialCallback;
-    [FieldOffset(0x1B8)] public ModelRenderer.Callback UnkCallback3;
-
-    [FieldOffset(0x224)] public float VfxScale;
-    [FieldOffset(0x270)] public ConstantBuffer* CharacterDataCBuffer; // Size has been observed to be 0xB0, contents may be InstanceParameter
-    [FieldOffset(0x278)] public ConstantBuffer* UnkCBuffer; // Size is also 0xB0
-
-    [FieldOffset(0x288)] public Texture** ColorTableTextures; // each one corresponds to a material, size = SlotCount * MaterialsPerSlot
-
-    [FieldOffset(0x290)] public Vector4 Tint;
-
-    [FieldOffset(0x2E0)] public float WeatherWetness;  // Set to 1.0f when raining and not covered or umbrella'd
-    [FieldOffset(0x2E4)] public float SwimmingWetness; // Set to 1.0f when in water
-    [FieldOffset(0x2E8)] public float WetnessDepth;    // Set to ~character height in GPose and higher values when swimming or diving.
-    [FieldOffset(0x2EC)] public float ForcedWetness;   // Set by vfunc 51 when using GPose, gets set to 0 in UpdateWetness every frame.
-
-    // next few fields are used temporarily when loading the render object and cleared after load
-    [FieldOffset(0x2F8)] public uint HasModelInSlotLoaded; // tracks which slots have loaded models into staging
-
-    [FieldOffset(0x2FC)] public uint HasModelFilesInSlotLoaded; // tracks which slots have loaded materials, etc into staging
-
-    [FieldOffset(0x300)] public void* TempData; // struct with temporary data (size >= 0x88)
-
-    [FieldOffset(0x308), Obsolete($"Use {nameof(PerSlotStagingArea)} instead", true)] public void* TempSlotData; // struct with temporary data for each slot (size = 0xE0 * slot count)
-    [FieldOffset(0x308)] public SlotStagingArea* PerSlotStagingArea;
-
-    [FieldOffset(0x350)] public Material** Materials; // size = SlotCount * MaterialsPerSlot
-
-    [FieldOffset(0x358)] public void* EID; // Client::System::Resource::Handle::ElementIdResourceHandle - EID file for base skeleton
-
-    [FieldOffset(0x360)] public void** IMCArray; // array of Client::System::Resource::Handle::ImageChangeDataResourceHandle ptrs size = SlotCount - IMC file for model in slot
-
-    [FieldOffset(0x3D8), FixedSizeArray] internal FixedSizeArray5<SkeletonAnimationContainer> _skeletonAnimationContainers; // tentative name
-
-    [FieldOffset(0x940)] public SkeletonResourceHandle* MaterialAnimationSkeleton;
-
-    [FieldOffset(0x948)] public ResourceHandle** MaterialAnimationPacks;
-
-    [FieldOffset(0x958)] public byte AnimationVariant; // the "a%04d" part in "%s/animation/a%04d/%s/%s.pap" in LoadAnimation
-
     public Span<Pointer<Model>> ModelsSpan => new(Models, SlotCount);
     public Span<Pointer<Texture>> ColorTableTexturesSpan => new(ColorTableTextures, SlotCount * MaterialsPerSlot);
-    public Span<Pointer<Material>> MaterialsSpan => new(Materials, SlotCount * MaterialsPerSlot);
+    public Span<Pointer<MaterialResourceHandle>> MaterialsSpan => new(Materials, SlotCount * MaterialsPerSlot);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B 4F 08 48 8B D0 4C 8B 01")]
     public static partial CharacterBase* Create(uint modelId, CustomizeData* customize, EquipmentModelId* equipData /* 10 times, 80 byte */, byte unk);
@@ -117,24 +107,41 @@ public unsafe partial struct CharacterBase {
     [MemberFunction("E8 ?? ?? ?? ?? 40 F6 C7 01 74 3A 40 F6 C7 04 75 27 48 85 DB 74 2F 48 8B 05 ?? ?? ?? ?? 48 8B D3 48 8B 48 30")]
     public partial void Destroy();
 
+    /// <summary>
+    /// Sets up the given's slot <see cref="Models"/> and/or <see cref="Materials"/> from the resources newly loaded in <see cref="PerSlotStagingArea"/>.
+    /// Can also perform other setup tasks on the slot, such as <see cref="ColorTableTextures"/>.
+    /// </summary>
+    /// <param name="slot">The slot to set up.</param>
+    /// <returns>Unknown yet. The typing is as conservative as possible.</returns>
+    [MemberFunction("89 54 24 ?? 55 56 41 56 48 81 EC")]
+    public partial nint SetupSlotModel(uint slot);
+
     [VirtualFunction(50)]
     public partial ModelType GetModelType();
 
-    public enum ModelType : byte {
-        Human = 1,
-        DemiHuman = 2,
-        Monster = 3,
-        Weapon = 4,
-    }
+    [VirtualFunction(56)]
+    public partial void LoadSlot(uint slot);
 
     [VirtualFunction(63)]
-    public partial nint OnRenderModel(Model* model);
+    public partial void OnRenderModel(Model* model);
 
     [VirtualFunction(64)]
-    public partial nint OnRenderMaterial(ModelRenderer.OnRenderMaterialParams* param);
+    public partial void OnRenderMaterial(ModelRenderer.OnRenderMaterialParams* param);
 
     [VirtualFunction(69)]
-    public partial ulong FlagSlotForUpdate(uint slot, EquipmentModelId* slotBytes);
+    public partial bool SetEquipmentSlotModel(uint slot, EquipmentModelId* slotData);
+
+    [VirtualFunction(69), Obsolete("Use SetEquipmentSlotModel", true)]
+    public partial ulong FlagSlotForUpdate(uint slot, EquipmentModelId* slotData);
+
+    [VirtualFunction(70)]
+    public partial bool SetGlassesSlotModel(uint glassesSlot, EquipmentModelId* slotData);
+
+    [VirtualFunction(71)]
+    public partial void GetEquipmentSlotModel(EquipmentModelId* outSlotData, uint slot);
+
+    [VirtualFunction(72)]
+    public partial void GetGlassesSlotModel(EquipmentModelId* outSlotData, uint slot);
 
     [VirtualFunction(75)]
     public partial CStringPointer ResolveRootPath(byte* pathBuffer, nuint pathBufferSize);
@@ -190,59 +197,59 @@ public unsafe partial struct CharacterBase {
     #region Resolve*Path(Span<byte>) overloads
     public ReadOnlySpan<byte> ResolveRootPath(Span<byte> pathBuffer) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveRootPath(pBuffer, (nuint)pathBuffer.Length);
+            return ResolveRootPath(pBuffer, (nuint)pathBuffer.Length).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveSklbPath(Span<byte> pathBuffer, uint partialSkeletonIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveSklbPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex);
+            return ResolveSklbPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveMdlPath(Span<byte> pathBuffer, uint slotIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveMdlPath(pBuffer, (nuint)pathBuffer.Length, slotIndex);
+            return ResolveMdlPath(pBuffer, (nuint)pathBuffer.Length, slotIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveSkpPath(Span<byte> pathBuffer, uint partialSkeletonIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveSkpPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex);
+            return ResolveSkpPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolvePhybPath(Span<byte> pathBuffer, uint partialSkeletonIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolvePhybPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex);
+            return ResolvePhybPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveKdbPath(Span<byte> pathBuffer, uint partialSkeletonIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveKdbPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex);
+            return ResolveKdbPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveBnmBPath(Span<byte> pathBuffer, uint partialSkeletonIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveBnmBPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex);
+            return ResolveBnmBPath(pBuffer, (nuint)pathBuffer.Length, partialSkeletonIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolvePapPath(Span<byte> pathBuffer, uint unkAnimationIndex, ReadOnlySpan<byte> animationName) {
         fixed (byte* pAnimationName = animationName)
         fixed (byte* pBuffer = pathBuffer)
-            return ResolvePapPath(pBuffer, (nuint)pathBuffer.Length, unkAnimationIndex, pAnimationName);
+            return ResolvePapPath(pBuffer, (nuint)pathBuffer.Length, unkAnimationIndex, pAnimationName).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveTmbPath(Span<byte> pathBuffer, ReadOnlySpan<byte> timelineName) {
         fixed (byte* pTimelineName = timelineName)
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveTmbPath(pBuffer, (nuint)pathBuffer.Length, pTimelineName);
+            return ResolveTmbPath(pBuffer, (nuint)pathBuffer.Length, pTimelineName).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveMaterialPapPath(Span<byte> pathBuffer, uint slotIndex, uint unkSId) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveMaterialPapPath(pBuffer, (nuint)pathBuffer.Length, slotIndex, unkSId);
+            return ResolveMaterialPapPath(pBuffer, (nuint)pathBuffer.Length, slotIndex, unkSId).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveImcPath(Span<byte> pathBuffer, uint slotIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveImcPath(pBuffer, (nuint)pathBuffer.Length, slotIndex);
+            return ResolveImcPath(pBuffer, (nuint)pathBuffer.Length, slotIndex).AsSpan();
     }
 
     /// <remarks>
@@ -251,28 +258,28 @@ public unsafe partial struct CharacterBase {
     public ReadOnlySpan<byte> ResolveMtrlPath(Span<byte> pathBuffer, uint slotIndex, ReadOnlySpan<byte> mtrlFileName) {
         fixed (byte* pMtrlFileName = mtrlFileName)
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveMtrlPath(pBuffer, (nuint)pathBuffer.Length, slotIndex, pMtrlFileName);
+            return ResolveMtrlPath(pBuffer, (nuint)pathBuffer.Length, slotIndex, pMtrlFileName).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveSkinMtrlPath(Span<byte> pathBuffer, uint slotIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveSkinMtrlPath(pBuffer, (nuint)pathBuffer.Length, slotIndex);
+            return ResolveSkinMtrlPath(pBuffer, (nuint)pathBuffer.Length, slotIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveDecalPath(Span<byte> pathBuffer, uint slotIndex) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveDecalPath(pBuffer, (nuint)pathBuffer.Length, slotIndex);
+            return ResolveDecalPath(pBuffer, (nuint)pathBuffer.Length, slotIndex).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveVfxPath(Span<byte> pathBuffer, uint slotIndex, out uint unkOutParam) {
         fixed (uint* pUnkOutParam = &unkOutParam)
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveVfxPath(pBuffer, (nuint)pathBuffer.Length, slotIndex, pUnkOutParam);
+            return ResolveVfxPath(pBuffer, (nuint)pathBuffer.Length, slotIndex, pUnkOutParam).AsSpan();
     }
 
     public ReadOnlySpan<byte> ResolveEidPath(Span<byte> pathBuffer) {
         fixed (byte* pBuffer = pathBuffer)
-            return ResolveEidPath(pBuffer, (nuint)pathBuffer.Length);
+            return ResolveEidPath(pBuffer, (nuint)pathBuffer.Length).AsSpan();
     }
     #endregion
 
@@ -376,6 +383,16 @@ public unsafe partial struct CharacterBase {
     }
     #endregion
 
+    [VirtualFunction(95)]
+    public partial byte GetDyeForSlot(uint slotIndex, uint dyeIndex);
+
+    // Returns a deformer pointer. The deformer struct hasn't been mapped yet.
+    [VirtualFunction(101)]
+    public partial nint CreateDeformer(uint slotIndex);
+
+    [VirtualFunction(102)]
+    public partial Model* CreateRenderModel(ModelResourceHandle* modelResourceHandle, nint deformer /* return value of CreateDeformer */);
+
     [VirtualFunction(108)]
     public partial bool IsFreeCompanyCrestVisibleOnSlot(byte slot);
 
@@ -396,9 +413,34 @@ public unsafe partial struct CharacterBase {
         [FieldOffset(0xF8)] public ResourceHandle* AnimationExchangeTable;
     }
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0xE0)]
-    public struct SlotStagingArea {
+    public partial struct SlotStagingArea {
         [FieldOffset(0x08)] public ModelResourceHandle* ModelResourceHandle;
+        [FieldOffset(0x18), FixedSizeArray] internal FixedSizeArray10<Pointer<MaterialResourceHandle>> _materialResourceHandles;
         [FieldOffset(0x68)] public MaterialResourceHandle* SkinMaterialResourceHandle;
+        [FieldOffset(0xD0)] public StagingAreaFlags Flags;
+    }
+
+    [Flags]
+    public enum StateFlag : ulong {
+        VisorToggled = 1UL << 6,
+        VisorChanging = 1UL << 7,
+        HasUmbrella = 1UL << 16,
+        VieraEarsHidden = 1UL << 31,
+        VieraEarsChanging = 1UL << 32
+    }
+
+    public enum ModelType : byte {
+        Human = 1,
+        DemiHuman = 2,
+        Monster = 3,
+        Weapon = 4,
+    }
+
+    [Flags]
+    public enum StagingAreaFlags : uint {
+        HasModel = 1u << 1,
+        HasMaterials = 1u << 3,
     }
 }

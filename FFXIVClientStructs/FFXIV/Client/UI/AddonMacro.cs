@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
@@ -28,9 +27,9 @@ public unsafe partial struct AddonMacro {
 
     [FieldOffset(0x3038), FixedSizeArray] internal FixedSizeArray100<bool> _macroCreated;
 
-    /// <summary>
-    /// Note: Value is only set when changing page.
-    /// </summary>
+    /// <remarks>
+    /// Value is only set when changing page.
+    /// </remarks>
     [FieldOffset(0x30BC)] public uint SelectedMacroIndex;
     [FieldOffset(0x30C0)] public uint SelectedPage;
 }

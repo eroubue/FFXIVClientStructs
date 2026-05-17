@@ -2,21 +2,31 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 // Client::Game::UI::Achievement
 [GenerateInterop]
-[StructLayout(LayoutKind.Explicit, Size = 0x7E8)]
+[StructLayout(LayoutKind.Explicit, Size = 0x848)]
 public unsafe partial struct Achievement {
     [StaticAddress("48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 04 30 FF C3", 3)]
     public static partial Achievement* Instance();
 
     [FieldOffset(0x08)] public AchievementState State;
-    [FieldOffset(0x0C), FixedSizeArray] internal FixedSizeArray488<byte> _completedAchievements;
+    [FieldOffset(0x0C), FixedSizeArray(false, true, 4078)] internal FixedSizeArray510<byte> _completedAchievements;
 
-    [FieldOffset(0x218)] public AchievementState ProgressRequestState;
-    [FieldOffset(0x21C)] public uint ProgressAchievementId;
-    [FieldOffset(0x220)] public uint ProgressCurrent;
-    [FieldOffset(0x224)] public uint ProgressMax;
+    /// <remarks> Last Five Achievement Ids </remarks>
+    [FieldOffset(0x20A), FixedSizeArray] internal FixedSizeArray5<ushort> _history;
+    // [FieldOffset(0x214), FixedSizeArray] internal FixedSizeArray32<byte> _unk1FC; // BitArray, index is Achievement.Unknown1 or Unknown2
+    [FieldOffset(0x230)] public AchievementState ProgressRequestState;
+    [FieldOffset(0x234)] public uint ProgressAchievementId;
+    [FieldOffset(0x238)] public uint ProgressCurrent;
+    [FieldOffset(0x23C)] public uint ProgressMax;
+
+    // Stuff for "Near Completion" tab and some other unimplemented tab, idk?
+    // [FieldOffset(0x242)] 2x byte for opened state?
+    // [FieldOffset(0x244)] 2x AchievementState
+    // [FieldOffset(0x24C)] 2x struct 0x1E5 length with each 3x struct of 0x80 that contains an array of 100 bytes???
+
+    // [FieldOffset(0x616), FixedSizeArray] internal FixedSizeArray479<byte> _completedItemBarterWarningAchievements; // unsure, currently only for Phantom weapons?!
 
     /// <summary> Requests Achievement Progress from the server. </summary>
-    [MemberFunction("48 83 EC ?? C7 81 ?? ?? ?? ?? ?? ?? ?? ?? 45 33 C9")]
+    [MemberFunction("E8 ?? ?? ?? ?? 41 C6 44 24 ?? ?? E9 ?? ?? ?? ?? 48 8D 4F ?? E8 ?? ?? ?? ?? 88 43")]
     public partial void RequestAchievementProgress(uint id);
 
     /// <summary> Receives Achievement Progress requested with <see cref="RequestAchievementProgress"/>. </summary>
@@ -29,6 +39,9 @@ public unsafe partial struct Achievement {
     [MemberFunction("E8 ?? ?? ?? ?? 04 30 FF C3")]
     public partial bool IsComplete(int achievementId);
 
+    [MemberFunction("E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B C8 ?? ?? ?? FF 52 ?? 8B 54 24 ?? 48 8B C8")]
+    public partial void SetAchievementCompleted(uint achievementId);
+
     /// <summary> Check if the achievement data has been "loaded" from the server. </summary>
     /// <remarks>
     /// The achievement data will only load when requested (so, when a player goes into the achievements menu).
@@ -40,9 +53,17 @@ public unsafe partial struct Achievement {
         => State is AchievementState.Loaded;
 
     /// <summary> Represents the loaded state of Achievement </summary>
-    public enum AchievementState : int {
-        Invalid = 0, // Achievement is initialized at this state
-        Requested = 1, // This state is set between the client request and receiving the data from the server
-        Loaded = 2, // Set upon data being received
+    public enum AchievementState {
+        /// <summary> Achievement is initialized at this state. </summary>
+        /// <remarks> Debug output calls it "invalide". </remarks>
+        Invalid = 0,
+
+        /// <summary> This state is set between the client request and receiving the data from the server. </summary>
+        /// <remarks> Debug output calls it "waiting". </remarks>
+        Requested = 1,
+
+        /// <summary> Set upon data being received. </summary>
+        /// <remarks> Debug output calls it "effective". </remarks>
+        Loaded = 2,
     }
 }

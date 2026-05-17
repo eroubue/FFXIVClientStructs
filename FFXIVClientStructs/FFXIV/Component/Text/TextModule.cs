@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.Excel;
 using ExcelSheet = FFXIVClientStructs.FFXIV.Common.Component.Excel.ExcelSheet;
 using FixedSheetInterface = FFXIVClientStructs.FFXIV.Component.Text.TextModuleInterface.FixedSheetInterface;
@@ -13,7 +12,7 @@ public unsafe partial struct TextModule {
     [FieldOffset(0x70)] public Localize Localize;
     [FieldOffset(0x98)] public MacroEncoder MacroEncoder;
 
-    //[FieldOffset(0x3A8)] public Utf8String UnkStr; // DecoderResult?
+    //[FieldOffset(0x3A8)] private Utf8String UnkStr; // DecoderResult?
     [FieldOffset(0x410)] public Utf8String MacroEncoderResult;
 
     [FieldOffset(0x478)] public FixedSheetInterface* FixedSheetInterface;

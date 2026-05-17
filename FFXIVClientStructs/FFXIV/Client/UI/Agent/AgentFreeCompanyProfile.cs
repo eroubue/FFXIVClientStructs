@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 // Client::UI::Agent::AgentFreeCompanyProfile
@@ -14,9 +12,9 @@ public unsafe partial struct AgentFreeCompanyProfile {
     //Next were the same as AgentINspect GuildStruct 0x08
     //These (in Decimal) are the same as used on the Lodestone
     [FieldOffset(0x028)] public long RequestId;
-    [FieldOffset(0x030)] public long UnkId2;
-    [FieldOffset(0x038)] public long UnkId3;
-    [FieldOffset(0x040)] public long UnkId4;
+    [FieldOffset(0x030)] private long UnkId2;
+    [FieldOffset(0x038)] private long UnkId3;
+    [FieldOffset(0x040)] private long UnkId4;
     [FieldOffset(0x048)] public CrestData Crest;
     //Estate Data
     [FieldOffset(0x050)] public ushort PlotNumber; //Starts at 0 (+1 in UI) Only last 6 bits are valid
@@ -38,10 +36,10 @@ public unsafe partial struct AgentFreeCompanyProfile {
     [FieldOffset(0x1A8)] public Utf8String Slogan;
     [FieldOffset(0x210)] public Utf8String EstateName;
     //4 Status bytes
-    //[FieldOffset(0x278)] public byte Unk278;
-    //[FieldOffset(0x279)] public byte Unk279;
-    //[FieldOffset(0x27A)] public byte Unk27A;
-    //[FieldOffset(0x27B)] public byte Unk27B;
+    //[FieldOffset(0x278)] private byte Unk278;
+    //[FieldOffset(0x279)] private byte Unk279;
+    //[FieldOffset(0x27A)] private byte Unk27A;
+    //[FieldOffset(0x27B)] private byte Unk27B;
 
     [StructLayout(LayoutKind.Explicit, Size = 0x6)]
     public struct FCProfile {
@@ -90,8 +88,9 @@ public enum GrandCompany : byte {
     ImmortalFlames = 3,
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x8)]
-public struct CrestData {
+public partial struct CrestData {
     //8 bits: Charge
     //6 bits: Ordinary
     //6 bits: Escutcheon
@@ -100,28 +99,12 @@ public struct CrestData {
     //7 bits unused
     //4 bits OrdinaryColor1
     //4 bits OrdinaryColor2
+    [BitField<byte>(nameof(Ordinary), 8, 6)]
+    [BitField<byte>(nameof(Escutcheon), 14, 6)]
+    [BitField<byte>(nameof(ChargeColor), 22, 3)]
+    [BitField<byte>(nameof(OrdinaryTincture1), 29, 4)]
+    [BitField<byte>(nameof(OrdinaryTincture2), 33, 4)]
     [FieldOffset(0x0), CExporterIgnore] public ulong Data;
     [FieldOffset(0x0)] public byte Charge;
     [FieldOffset(0x4)] public byte OrdinaryTinctures;
-
-    public byte Ordinary {
-        get => (byte)((Data >> 8) & 0x3F);
-        set => Data = (Data & 0xFFFFC0FF) + (ulong)((value & 0x3F) << 8);
-    }
-    public byte Escutcheon {
-        get => (byte)((Data >> 0xE) & 0x3F);
-        set => Data = (Data & 0xFFF03FFF) + (ulong)((value & 0x3F) << 0xE);
-    }
-    public byte ChargeColor {
-        get => (byte)((Data >> 0x16) & 0x7);
-        set => Data = (Data & 0xFE3FFFFF) + (ulong)((value & 0x7) << 0x16);
-    }
-    public byte OrdinaryTincture1 {
-        get => (byte)(OrdinaryTinctures & 0xF);
-        set => OrdinaryTinctures = (byte)((OrdinaryTinctures & 0xF0) + (value & 0x0F));
-    }
-    public byte OrdinaryTincture2 {
-        get => (byte)((OrdinaryTinctures >> 4) & 0xF);
-        set => OrdinaryTinctures = (byte)(((value & 0x0F) << 4) + (OrdinaryTinctures & 0x0F));
-    }
 }

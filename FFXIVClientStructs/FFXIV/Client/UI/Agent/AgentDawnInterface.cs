@@ -1,7 +1,8 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentDawnInterface
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [GenerateInterop(isInherited: true)]
 [Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
@@ -18,7 +19,7 @@ public unsafe partial struct AgentDawnInterface {
         [FieldOffset(0x01)] public byte SelectedContentEntry;
         [FieldOffset(0x02)] public byte ExpansionCount;
         [FieldOffset(0x03)] public byte SelectedExpansion;
-        [FieldOffset(0x08), FixedSizeArray] internal FixedSizeArray5<DawnExpansionEntry> _expansions;
+        [FieldOffset(0x08), FixedSizeArray] internal FixedSizeArray6<DawnExpansionEntry> _expansions;
         [FieldOffset(0x68), FixedSizeArray] internal FixedSizeArray80<DawnContentEntry> _contentEntries;
         [FieldOffset(0x4B68), FixedSizeArray] internal FixedSizeArray80<Pointer<DawnContentEntry>> _contentList;
     }

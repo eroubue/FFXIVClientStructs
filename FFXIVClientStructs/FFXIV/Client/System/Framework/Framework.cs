@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using FFXIVClientStructs.FFXIV.Client.Sound;
@@ -18,12 +17,23 @@ namespace FFXIVClientStructs.FFXIV.Client.System.Framework;
 
 // Client::System::Framework::Framework
 [GenerateInterop]
-[VirtualTable("48 8D 05 ?? ?? ?? ?? 66 C7 41 ?? ?? ?? 48 89 01 48 8B F1", 3)]
-[StructLayout(LayoutKind.Explicit, Size = 0x35F0)]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? ?? ?? ?? 48 8B F1 49 89 6B", 3)]
+[StructLayout(LayoutKind.Explicit, Size = 0x35D8)]
 public unsafe partial struct Framework {
-    [StaticAddress("49 8B DC 48 89 1D ?? ?? ?? ??", 6, isPointer: true)]
+    [StaticAddress("48 8B 1D ?? ?? ?? ?? 8B 7C 24", 3, isPointer: true)]
     public static partial Framework* Instance();
 
+    // Teardown sequence:
+    // - (optional) UIModule.ExitGame() sets UIModule.ShouldExitGame to true, that makes it call Framework.Exit() in its Update function
+    // - Framework.Exit() sets IsExiting to true and sets the ExitCode
+    // - When IsExiting is true: IsDestroying is set to true in TaskIntervalEnd
+    // - When IsDestroying and Framework.Destroy() both return true: Framework.Free() is called
+    // - At the end of Framework.Free(), IsFreed is set to true, which makes it stop calling Tick
+    // - Framework.Dtor() is called and some other stuff happens until WinMain ends
+    [FieldOffset(0x0008)] public bool IsDestroying;
+    [FieldOffset(0x0009)] public bool IsExiting;
+    [FieldOffset(0x000A)] public bool IsFreed;
+    [FieldOffset(0x000C)] public int ExitCode;
     [FieldOffset(0x0010)] public SystemConfig SystemConfig;
     [FieldOffset(0x0460)] public DevConfig DevConfig;
     [FieldOffset(0x0570)] public CharamakeAvatarSaveDataContainer* CharamakeAvatarSaveData;
@@ -93,6 +103,7 @@ public unsafe partial struct Framework {
     [FieldOffset(0x2B70)] public UIClipboard* UIClipboard;
     [FieldOffset(0x2B80)] public EnvironmentManager* EnvironmentManager;
     [FieldOffset(0x2B88)] public SoundManager* SoundManager;
+    [FieldOffset(0x2B90)] public ClipSoundManager* ClipSoundManager;
     [FieldOffset(0x2BD0)] public LuaState LuaState;
 
     [FieldOffset(0x2BF8), FixedSizeArray(isString: true)] internal FixedSizeArray256<byte> _gameVersion;
@@ -137,6 +148,15 @@ public unsafe partial struct Framework {
     [VirtualFunction(4)]
     public partial bool Tick();
 
+    [MemberFunction("E8 ?? ?? ?? ?? 4B 8B 8C F4")]
+    public partial ClientPlatform GetClientPlatform();
+
+    [MemberFunction("89 51 ?? C6 41 ?? ?? 48 8B 0D")]
+    public partial void Exit(int exitCode);
+
+    [MemberFunction("E8 ?? ?? ?? ?? 33 C0 E9 ?? ?? ?? ?? 48 8B 05")]
+    public partial void ExitFromWindow();
+
     [MemberFunction("E8 ?? ?? ?? ?? 80 7B 1D 01")]
     public partial UIModule* GetUIModule();
 
@@ -146,7 +166,7 @@ public unsafe partial struct Framework {
     [MemberFunction("80 B9 ?? ?? ?? ?? 00 74 ?? 48 8B 81 ?? ?? ?? ?? C3")]
     public partial NetworkModuleProxy* GetNetworkModuleProxy();
 
-    [MemberFunction("E8 ?? ?? ?? ?? 03 07")]
+    [MemberFunction("E8 ?? ?? ?? ?? 44 6B C3")]
     public static partial long GetServerTime();
 
     /// <summary>
@@ -164,7 +184,7 @@ public unsafe partial struct Framework {
     /// <see cref="IsSteamGame"/> to true, though this seemingly has no effect (??).
     /// </summary>
     /// <returns>Returns <c>true</c> if the API was initialized successfully, false otherwise.</returns>
-    [MemberFunction("48 89 5C 24 ?? 57 48 81 EC 40 02 00 00 48 8B 05")]
+    [MemberFunction("48 89 5C 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8B F9 C6 81")]
     public partial bool SetupSteamApi();
 
     [GenerateInterop]
@@ -172,4 +192,16 @@ public unsafe partial struct Framework {
     public partial struct ExVersionString {
         [FieldOffset(0), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _version;
     }
+}
+
+public enum ClientPlatform {
+    Win32 = 0, // Windows 32-bit
+    PS3 = 1, // PlayStation 3
+    PS4 = 2, // PlayStation 4
+    Win64 = 3, // Windows 64-bit
+    Mac32 = 4, // macOS 32-bit (Windows build under Wine)
+    Mac64 = 5, // macOS 64-bit (Windows build under Wine)
+    PS5 = 6, // PlayStation 5
+    XSX = 7, // Xbox Series X
+    Invalid = 9,
 }

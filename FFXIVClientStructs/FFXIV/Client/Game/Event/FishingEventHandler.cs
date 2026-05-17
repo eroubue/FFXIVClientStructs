@@ -1,0 +1,151 @@
+using FFXIVClientStructs.FFXIV.Component.GUI;
+
+namespace FFXIVClientStructs.FFXIV.Client.Game.Event;
+
+// Client::Game::Event::FishingEventHandler
+//   Client::Game::Event::EventHandler
+//   Component::GUI::AtkModuleInterface::AtkEventInterface
+[GenerateInterop]
+[Inherits<EventHandler>, Inherits<AtkModuleInterface.AtkEventInterface>]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 89 83 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 89 8B", 3, 277)]
+[StructLayout(LayoutKind.Explicit, Size = 0x230)]
+public unsafe partial struct FishingEventHandler {
+    [FieldOffset(0x1C0)] private byte Unk220;
+    [FieldOffset(0x1C8)] public FishingState State;
+
+    /// <remarks>
+    /// 4 Hz inverse sawtooth between one and zero.  Latches upon cast.  No clue what it is for.
+    /// </remarks>
+    [FieldOffset(0x1CC)] private float Unk22C;
+
+    /// <summary>
+    /// Whether you are at a fishing hole.
+    /// </summary>
+    /// <remarks>
+    /// Only indicates that you are at a hole, not whether you can actually fish there.  Only updates when on FSH.
+    /// </remarks>
+    [FieldOffset(0x1D0)] public bool CanFish;
+
+    /// <remarks>
+    /// Returns to false when opportunity is gone (i.e., Spareful Hand is used).
+    /// </remarks>
+    [FieldOffset(0x1D1)] public bool CanMoochPreviousCatch;
+
+    /// <remarks>
+    /// Returns to false when opportunity is gone (i.e., 15s elapsed).  Ignores skill cooldown.
+    /// </remarks>
+    [FieldOffset(0x1D2)] public bool CanMooch2PreviousCatch;
+
+    [FieldOffset(0x1D3)] public bool CanReleasePreviousCatch;
+
+    /// <remarks>
+    /// True while in the process of sitting down or standing up.
+    /// </remarks>
+    [FieldOffset(0x1D4)] public bool ChangingPosition;
+
+    [FieldOffset(0x1D5)] public bool CanIdenticalCastPreviousCatch;
+    [FieldOffset(0x1D6)] public bool CanSurfaceSlapPreviousCatch;
+    [FieldOffset(0x1D7)] private bool Unk237; // Never seen false.  vf57 actively sets it to true, whatever that does.
+    [FieldOffset(0x1D8)] public FishingBaitFlags CurrentCastBaitFlags;
+
+    /// <summary>
+    /// The index into <see cref="SwimBaitItemIds"/> of the currently-selected swimbait.
+    /// </summary>
+    /// <remarks>
+    /// This is -1 when no swimbait has been selected.
+    /// </remarks>
+    [FieldOffset(0x1DC)] public sbyte CurrentSelectedSwimBait;
+
+    /// <summary>
+    /// The item IDs of currently-stored swimbait.
+    /// </summary>
+    [FieldOffset(0x1E0), FixedSizeArray] internal FixedSizeArray3<uint> _swimBaitItemIds;
+
+    [FieldOffset(0x1EC)] private uint Unk24C; // Sometimes matches 0x224, but that offset may just be uninitialized padding.
+
+    /// <summary>
+    /// Unix time (in milliseconds) for when the current Mooch/Spareful Hand opportunity will cease being available (if ever).
+    /// </summary>
+    [FieldOffset(0x1F0)] public long MoochOpportunityExpirationTime;
+
+    /// <summary>
+    /// Unix time (in milliseconds) for when actions like Surface Slap will cease being available.
+    /// </summary>
+    [FieldOffset(0x1F8)] public long CatchActionExpirationTime;
+
+    // An instance of something that looks like it has a 6-function vtable right before this event handler's vtable.  Probably 0x30 bytes long.
+    //[FieldOffset( 0x260 )] private void* vTablePtr;
+    //[FieldOffset( 0x268 )] private byte Unk268;
+    //[FieldOffset( 0x270 )] public FishingEventHandler* FishingEventHandlerInstance;
+    //[FieldOffset( 0x278 )] private ulong Unk278;
+    //[FieldOffset( 0x280 )] private uint Unk280;
+    //[FieldOffset( 0x284 )] private ulong Unk284; // Unaligned, but it disassembles as a qword in the constructor, so idk.
+
+    // see FishingHookStrength if you want to observe hooks. Other values have a lot of overlap with FishingState, and there's standing vs sitting differences
+    [VirtualFunction(276)]
+    public partial bool PlayAnimation(Character.Character* chara, ushort actionTimelineId, ulong callbackParam);
+
+    /// <summary>
+    /// Changes the currently equipped bait.
+    /// </summary>
+    /// <param name="baitId">ItemId of bait to change to.</param>
+    public AtkValue ChangeBait(int baitId) {
+        var returnValue = new AtkValue();
+        var baitValue = stackalloc AtkValue[2];
+        baitValue[0].Type = AtkValueType.Int;
+        baitValue[0].Int = baitId;
+        baitValue[1].Type = AtkValueType.Bool;
+        baitValue[1].Bool = false;
+        ReceiveEvent(&returnValue, baitValue, 2, 2);
+        return returnValue;
+    }
+}
+
+public enum FishingHookStrength {
+    Weak = 292,
+    Strong = 293,
+    Legendary = 294,
+}
+
+[Flags]
+public enum FishingBaitFlags {
+    Normal = 0,
+    AmbitiousLure = 0x1,
+    ModestLure = 0x2,
+    Mooch = 0x10,
+    Swimbait = 0x20,
+}
+
+public enum FishingState {
+    None = 0,
+    CastingOut = 1,
+    /// <remarks>
+    /// Used when fish slips, when there is no bite, briefly after reeling in a fish, and when using Rest.
+    /// </remarks>
+    PullingPoleIn = 2,
+    Quitting = 3,
+    /// <summary>
+    /// The standby "gathering" condition.
+    /// </summary>
+    PoleReady = 4,
+    Bite = 5,
+    /// <remarks>
+    /// Includes the subsequent reeling in.
+    /// </remarks>
+    Hooking = 6,
+    ReleasingCatch = 7,
+    ConfirmingCollectable = 8,
+    /// <remarks>
+    /// Only during the action's animation.
+    /// </remarks>
+    AmbitiousLure = 9,
+    /// <remarks>
+    /// Only during the action's animation.
+    /// </remarks>
+    ModestLure = 10,
+    Unk11 = 11,
+    /// <remarks>
+    /// Or air, sand, etc.; just when you are actually fishing.
+    /// </remarks>
+    LineInWater = 12,
+}

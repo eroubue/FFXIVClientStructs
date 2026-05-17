@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.System.Input;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Common.Math;
@@ -11,7 +10,7 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 //   Component::GUI::AtkEventTarget
 [GenerateInterop]
 [Inherits<AtkEventTarget>]
-[StructLayout(LayoutKind.Explicit, Size = 0x75E00)]
+[StructLayout(LayoutKind.Explicit, Size = 0x75EA8)]
 public unsafe partial struct AtkStage {
     [StaticAddress("48 8B 05 ?? ?? ?? ?? 4C 8B 40 18 45 8B 40 18", 3, isPointer: true)]
     public static partial AtkStage* Instance();
@@ -32,26 +31,26 @@ public unsafe partial struct AtkStage {
     [FieldOffset(0x78)] public AtkDragDropManager DragDropManager;
     [FieldOffset(0x140)] public AtkGroupManager AtkGroupManager;
     [FieldOffset(0x168)] public AtkTooltipManager TooltipManager;
-    [FieldOffset(0x2B8)] public DialogueStruct Dialogue;
-    [FieldOffset(0x2F8)] public FilterStruct Filter;
-    [FieldOffset(0x308)] public OperationGuideStruct OperationGuide;
-    [FieldOffset(0x338)] public AtkCursor AtkCursor;
-    [FieldOffset(0x358), FixedSizeArray] internal FixedSizeArray32<AtkEventDispatcher> _atkEventDispatcher;
-    [FieldOffset(0x858)] public uint NextEventDispatcherIndex;
-    [FieldOffset(0x85C)] public bool CanDispatchEvents;
-    [FieldOffset(0x860)] public Size ScreenSize;
-    [FieldOffset(0x868)] public float ScreenSizeScale;
-    [FieldOffset(0x86C)] public bool IsScreenSizeScaled;
-    [FieldOffset(0x870)] public AtkEventManager ViewportEventManager; // more like GlobalEventManager
-    [FieldOffset(0x878), FixedSizeArray] internal FixedSizeArray10000<AtkEvent> _atkEventPool;
-    [FieldOffset(0x75B78)] public AtkEvent* NextEvent;
-    [FieldOffset(0x75B80)] public StdDeque<TextParameter> FormatTextParameters;
-    [FieldOffset(0x75BA8)] public Utf8String FormatOutput;
-    [FieldOffset(0x75C10), FixedSizeArray(isString: true)] internal FixedSizeArray384<byte> _formatCStringBuffer;
-    [FieldOffset(0x75D90)] public AtkTimer ButtonClickTimer; // for example, used in NumericInput when clicking +/- buttons
-    [FieldOffset(0x75DC0)] public AtkTimer ButtonClickRepeatTimer; // for example, used in NumericInput when holding down +/- buttons
-    [FieldOffset(0x75DF0)] public AtkTimer* TimerArray; // only 1 right now
-    [FieldOffset(0x75DF8)] public int TimerCount;
+    [FieldOffset(0x360)] public DialogueStruct Dialogue;
+    [FieldOffset(0x3A0)] public FilterStruct Filter;
+    [FieldOffset(0x3B0)] public OperationGuideStruct OperationGuide;
+    [FieldOffset(0x3E0)] public AtkCursor AtkCursor;
+    [FieldOffset(0x400), FixedSizeArray] internal FixedSizeArray32<AtkEventDispatcher> _atkEventDispatcher;
+    [FieldOffset(0x900)] public uint NextEventDispatcherIndex;
+    [FieldOffset(0x904)] public bool CanDispatchEvents;
+    [FieldOffset(0x908)] public Size ScreenSize;
+    [FieldOffset(0x910)] public float ScreenSizeScale;
+    [FieldOffset(0x914)] public bool IsScreenSizeScaled;
+    [FieldOffset(0x918)] public AtkEventManager ViewportEventManager; // more like GlobalEventManager
+    [FieldOffset(0x920), FixedSizeArray] internal FixedSizeArray10000<AtkEvent> _atkEventPool;
+    [FieldOffset(0x75C20)] public AtkEvent* NextEvent;
+    [FieldOffset(0x75C28)] public StdDeque<TextParameter> FormatTextParameters;
+    [FieldOffset(0x75C50)] public Utf8String FormatOutput;
+    [FieldOffset(0x75CB8), FixedSizeArray(isString: true)] internal FixedSizeArray384<byte> _formatCStringBuffer;
+    [FieldOffset(0x75E38)] public AtkTimer ButtonClickTimer; // for example, used in NumericInput when clicking +/- buttons
+    [FieldOffset(0x75E68)] public AtkTimer ButtonClickRepeatTimer; // for example, used in NumericInput when holding down +/- buttons
+    [FieldOffset(0x75E98)] public AtkTimer* TimerArray; // only 1 right now
+    [FieldOffset(0x75EA0)] public int TimerCount;
 
     [MemberFunction("48 8B 51 ?? 48 0F BF 82")]
     public partial AtkResNode* GetFocus();
@@ -62,7 +61,7 @@ public unsafe partial struct AtkStage {
     [MemberFunction("81 62 ?? ?? ?? ?? ?? 45 33 C0")]
     public partial void ReturnAtkEventToPool(AtkEvent* evt);
 
-    [MemberFunction("48 8B 41 38 48 8B 40 18")]
+    [MemberFunction("E8 ?? ?? ?? ?? 6B 94")]
     public partial NumberArrayData** GetNumberArrayData();
 
     public NumberArrayData* GetNumberArrayData(NumberArrayType type)
@@ -74,7 +73,7 @@ public unsafe partial struct AtkStage {
     public StringArrayData* GetStringArrayData(StringArrayType type)
         => GetStringArrayData()[(int)type];
 
-    [MemberFunction("48 8B 41 38 48 8B 40 48")]
+    [MemberFunction("E8 ?? ?? ?? ?? 48 8B 48 ?? 48 89 4D")]
     public partial ExtendArrayData** GetExtendArrayData();
 
     public ExtendArrayData* GetExtendArrayData(ExtendArrayType type)
@@ -98,10 +97,20 @@ public unsafe partial struct AtkStage {
     [StructLayout(LayoutKind.Explicit, Size = 0x30)]
     public unsafe struct OperationGuideStruct {
         [FieldOffset(0x00)] public AtkStage* AtkStage;
-        [FieldOffset(0x08)] private AtkUnitBase* UnkUnitBase1;
-        [FieldOffset(0x10)] private AtkUnitBase* UnkUnitBase2;
+        /// <summary>
+        /// The addon the Operations Guide is currently attached to.
+        /// </summary>
+        [FieldOffset(0x08)] public AtkUnitBase* AttachedToAddon;
+        /// <summary>
+        /// The addon the Operations Guide is currently attached to.
+        /// <br/>Appears to be the same as AttachedToAddon.
+        /// </summary>
+        [FieldOffset(0x10)] public AtkUnitBase* AttachedToAddon2;
         [FieldOffset(0x18)] private byte Unk18;
-        [FieldOffset(0x19)] private byte Unk19;
+        /// <summary>
+        /// True if the OperationsGuide should refresh.
+        /// </summary>
+        [FieldOffset(0x19)] public bool RequestRefresh;
         [FieldOffset(0x1A)] private byte Unk1A;
         [FieldOffset(0x1B)] private byte Unk1B;
         [FieldOffset(0x1C)] private short X;

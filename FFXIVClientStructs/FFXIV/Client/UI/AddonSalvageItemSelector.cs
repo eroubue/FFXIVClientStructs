@@ -27,6 +27,9 @@ public unsafe partial struct AddonSalvageItemSelector {
         [FieldOffset(0x18)] public uint Quantity;
         [FieldOffset(0x1C)] public uint JobIconId;
         [FieldOffset(0x20)] public CStringPointer JobNamePtr;
-        [FieldOffset(0x28)] public byte Unknown28;
+        [FieldOffset(0x28)] private byte Unknown28;
     }
+
+    [MemberFunction("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 49 8B 38")]
+    public partial void PopulateSalvageItemListItem(int index, AtkResNode** nodeList, AtkComponentListItemRenderer* listItemRenderer);
 }

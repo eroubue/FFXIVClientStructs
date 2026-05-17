@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
@@ -15,7 +14,7 @@ public unsafe partial struct PreviewController {
     [FieldOffset(0x20)] public AtkComponentCheckBox* CharacterDisplayModeCheckBox;
     [FieldOffset(0x28)] public AtkCollisionNode* CollisionNode;
     [FieldOffset(0x30)] public AtkUnitBase* OwnerAddon;
-    [FieldOffset(0x38)] public AtkUnitBase* Unk38Addon;
+    [FieldOffset(0x38)] private AtkUnitBase* Unk38Addon;
     [FieldOffset(0x40)] public int CallbackBaseId;
     [FieldOffset(0x44)] public DragButtonType DragButton;
     [FieldOffset(0x48)] public short DragStartPosX;
@@ -24,7 +23,7 @@ public unsafe partial struct PreviewController {
     [FieldOffset(0x50)] public Utf8String CharacterDisplayModeTooltipText;
 
     [MemberFunction("E8 ?? ?? ?? ?? 80 A6 ?? ?? ?? ?? ?? B8")]
-    public partial void Ctor(AtkStage* atkStage);
+    public partial PreviewController* Ctor(AtkStage* atkStage);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B CD E8 ?? ?? ?? ?? 48 8B F0")]
     public partial void Detach();

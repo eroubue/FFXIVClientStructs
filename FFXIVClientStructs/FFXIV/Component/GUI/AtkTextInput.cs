@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.System.Input;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.Completion;
@@ -8,32 +7,39 @@ using FFXIVClientStructs.FFXIV.Component.Text;
 namespace FFXIVClientStructs.FFXIV.Component.GUI;
 
 [GenerateInterop]
-[StructLayout(LayoutKind.Explicit, Size = 0xCC0)]
+[StructLayout(LayoutKind.Explicit, Size = 0xCE8)]
 public unsafe partial struct AtkTextInput {
     [FieldOffset(0x8)] public AtkTextInputEventInterface* TargetTextInputEventInterface;
     [FieldOffset(0x10)] public CompletionModule* CompletionModule;
     [FieldOffset(0x18)] public TextService* TextService;
-    [FieldOffset(0x20), FixedSizeArray] internal FixedSizeArray19<Pointer<RaptureAtkHistory>> _atkHistory;
-    [FieldOffset(0xC0)] public RaptureTextModule* RaptureTextModule;
-    [FieldOffset(0xC8)] public TextChecker* TextChecker;
-    [FieldOffset(0xD0)] public AtkFontCodeModule* AtkFontCodeModule;
+    [FieldOffset(0x20), FixedSizeArray] internal FixedSizeArray23<Pointer<RaptureAtkHistory>> _atkHistory;
+    [FieldOffset(0xD8)] public int ActiveAtkHistoryIndex;
+    [FieldOffset(0xE0)] public RaptureTextModule* RaptureTextModule;
+    [FieldOffset(0xE8)] public TextChecker* TextChecker;
+    [FieldOffset(0xF0)] public AtkFontCodeModule* AtkFontCodeModule;
 
-    [FieldOffset(0xDA)] public short CursorPos;
-    [FieldOffset(0xDC)] public short TextLength;
-    [FieldOffset(0xDE)] public short SelectionStart;
-    [FieldOffset(0xE0)] public short SelectionEnd;
+    [FieldOffset(0xFA)] public short CursorPos;
+    [FieldOffset(0xFC)] public short TextLength;
+    [FieldOffset(0xFE)] public short SelectionStart;
+    [FieldOffset(0x100)] public short SelectionEnd;
 
-    [FieldOffset(0x1C0)] public ClipBoard ClipboardData;
-    [FieldOffset(0x298)] public Utf8String CopyBufferRaw;
-    [FieldOffset(0x300)] public Utf8String CopyBufferFiltered;
+    [FieldOffset(0x1E0)] public ClipBoard ClipboardData;
+    [FieldOffset(0x2C0)] public Utf8String CopyBufferRaw;
+    [FieldOffset(0x328)] public Utf8String CopyBufferFiltered;
 
-    [FieldOffset(0xBF0)] public ushort CompletionDepth;
+    [FieldOffset(0x870)] public Utf8String RawInputString;
+    [FieldOffset(0xA78)] public Utf8String EvaluatedInputString;
 
-    [FieldOffset(0xC10)] public AllowedEntities InputSanitizationFlags;
+    [FieldOffset(0xC18)] public ushort CompletionDepth;
+
+    [FieldOffset(0xC38)] public AllowedEntities InputSanitizationFlags;
 
     /// <remarks> Call this only if <see cref="InputSanitizationFlags"/> has Payloads! </remarks>
-    [MemberFunction("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B 4E 18 48 8B 01")]
+    [MemberFunction("40 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 66 83 B9")]
     public partial void OpenCompletion();
+
+    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 0F 85 ?? ?? ?? ?? C6 44 24 ?? ??")]
+    public partial bool ProcessKeyShortcut(SeVirtualKey key, KeyModifiers* modifiers);
 
     // Component::GUI::AtkTextInput::AtkTextInputEventInterface
     // no explicit constructor, just an event interface 
@@ -56,5 +62,15 @@ public unsafe partial struct AtkTextInput {
         [FieldOffset(0x6)] public ushort StringLength;
         [FieldOffset(0x8)] public Utf8String* String1;
         [FieldOffset(0x10)] public Utf8String* String2;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x06)]
+    public struct KeyModifiers {
+        [FieldOffset(0x00)] public bool IsControlDown;
+        [FieldOffset(0x01)] public bool IsShiftDown;
+        [FieldOffset(0x02)] public bool IsAltDown;
+        [FieldOffset(0x03)] public bool IsCapitalDown;
+        [FieldOffset(0x04)] public bool IsNumlockDown;
+        [FieldOffset(0x05)] public bool IsScrollDown;
     }
 }

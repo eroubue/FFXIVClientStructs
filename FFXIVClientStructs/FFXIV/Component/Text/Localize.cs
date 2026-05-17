@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Common.Component.Excel;
 using FFXIVClientStructs.FFXIV.Component.Excel;
 using ExcelModuleInterface = FFXIVClientStructs.FFXIV.Component.Excel.ExcelModuleInterface;
@@ -12,5 +11,5 @@ namespace FFXIVClientStructs.FFXIV.Component.Text;
 public unsafe partial struct Localize {
     [FieldOffset(0x08)] public ExcelModuleInterface* ExcelModuleInterface;
     [FieldOffset(0x10)] public ExcelSheet* ExcelSheet;
-    [FieldOffset(0x18)] public StdMap<Utf8String, nint> UnkMap;
+    [FieldOffset(0x18)] private StdMap<Utf8String, nint> UnkMap;
 }

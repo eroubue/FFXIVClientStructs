@@ -22,25 +22,31 @@ CP0001: Type 'FFXIVClientStructs.STD.StdSet<TKey>' exists on ida/cs-main/FFXIVCl
 CP0002: Member 'System.ReadOnlySpan<byte> FFXIVClientStructs.STD.StdString.AsSpan()' exists on ida/cs-main/FFXIVClientStructs.dll but not on ida/cs-pr/FFXIVClientStructs.dll
 CP0002: Member 'FFXIVClientStructs.FFXIV.Client.Game.HouseId.implicit operator long(FFXIVClientStructs.FFXIV.Client.Game.HouseId)' exists on ida/cs-main/FFXIVClientStructs.dll but not on ida/cs-pr/FFXIVClientStructs.dll
 CP0007: Type 'FFXIVClientStructs.FFXIV.Component.SteamApi.SteamTypes' does not inherit from base type 'System.Object' on D:\source\repos\dotnet-compat-checker\test_files\fail\FFXIVClientStructs-pr.dll but it does on D:\source\repos\dotnet-compat-checker\test_files\fail\FFXIVClientStructs-main.dll
+CP0021: Cannot add constraint 'T:FFXIVClientStructs.FFXIV.Client.System.Memory.ICreatable{``0}' on type parameter 'T' of 'FFXIVClientStructs.FFXIV.Client.System.Memory.IMemorySpace.Create<T>()'.
  */
 internal class Parse {
     public static ChangeType? ParseBreakingChange(string line) {
         if (line.Contains("e__FixedBuffer")) return null;
         var parts = line.Split(": ");
         var code = Enum.Parse<Code>(parts[0]);
-        var type = Enum.Parse<Type>(parts[1].Split(' ')[0]);
-        var message = parts[1][parts[1].IndexOf(' ')..].Trim();
-        var change = message[..message.IndexOf(" on", StringComparison.Ordinal)];
-        message = message[change.Length..].Trim();
-        change = change.Replace("'", "").Replace("exists", "").Replace(", ", ",").Trim();
+        string? message, change;
+        if (code != Code.CP0021) {
+            var type = Enum.Parse<Type>(parts[1].Split(' ')[0]);
+            message = parts[1][parts[1].IndexOf(' ')..].Trim();
+            change = message[..message.IndexOf(" on", StringComparison.InvariantCulture)];
+            message = message[change.Length..].Trim();
+            change = change.Replace("'", "").Replace("exists", "").Replace(", ", ",").Trim();
 
-        return code switch {
-            Code.CP0002 => ParseMember(code, type, change, message),
-            Code.CP0007 => ParseNotInherit(code, type, change, message),
-            Code.CP0001 => new ChangeType(code, type, new Change(null, GetLocation(change)), message),
-            _ => new ChangeType(code, type, new Change(change), message)
-        };
-
+            return code switch {
+                Code.CP0002 => ParseMember(code, type, change, message),
+                Code.CP0007 => ParseNotInherit(code, type, change, message),
+                Code.CP0001 => new ChangeType(code, type, new Change(null, GetLocation(change)), message),
+                _ => new ChangeType(code, type, new Change(change), message)
+            };
+        }
+        message = parts[1].Trim();
+        change = message[(message.IndexOf("of ", StringComparison.InvariantCulture) + 3)..].Replace("'", "").Trim().Trim('.');
+        return new ChangeType(code, Type.Type, new Change(null, GetLocation(change)), message);
     }
 
     public static Location GetLocation(string location) {
@@ -52,6 +58,9 @@ internal class Parse {
             @namespace = location[..location.IndexOf('.')];
             @class = location[location.IndexOf('.')..];
             return new Location(@namespace.Trim('.').Replace(",", ", "), @class.Trim('.').Replace(",", ", "));
+        }
+        if (count == -1 && location.LastIndexOf('.') == -1) {
+            return new Location("", location);
         }
         var field = count == -1 ? location[location.LastIndexOf('.')..] : location[location[..count].LastIndexOf('.')..];
         @namespace = count == -1 ? location[..location.LastIndexOf('.')] : location[..location[..count].LastIndexOf('.')];
@@ -76,7 +85,7 @@ internal class Parse {
 
     public static ChangeType ParseMember(Code code, Type type, string change, string message) {
         var count = change.IndexOf('(');
-        if (change.Split(' ')[1] == "operator") {
+        if (change.Split(' ').Length > 1 && change.Split(' ')[1] == "operator") {
             return new ChangeType(code, type, new Change("operator", GetOperatorLocation(change)), message);
         }
         var lastSpace = count == -1 ? change.LastIndexOf(' ') : change[..count].LastIndexOf(' ');
@@ -118,7 +127,9 @@ public enum Code {
     CP0017,
     CP0018,
     CP0019,
-    CP0020
+    CP0020,
+    [Description("Constraint type changed")]
+    CP0021
 }
 
 public enum Type {
@@ -137,7 +148,7 @@ public record Change(string? Type, Location? Main = null, Location? Parent = nul
 }
 
 public record Location(string Namespace, string Class, string? Member = null) {
-    public override string ToString() => !string.IsNullOrWhiteSpace(Member) ? Member.Pastel(Color.SkyBlue) : $"{Namespace}.{Class}".Pastel(Color.SkyBlue);
+    public override string ToString() => !string.IsNullOrWhiteSpace(Member) ? Member.Pastel(Color.SkyBlue) : !string.IsNullOrWhiteSpace(Namespace) ? $"{Namespace}.{Class}".Pastel(Color.SkyBlue) : $"{Class}".Pastel(Color.SkyBlue);
     public bool IsCompat() => !Namespace.Contains("FFXIVClientStructs.Interop") &&
                               Class != "Addresses" &&
                               Class != "MemberFunctionPointers" &&

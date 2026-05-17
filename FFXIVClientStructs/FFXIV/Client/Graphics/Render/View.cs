@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Common.Math;
-
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
 // Client::Graphics::Render::View
@@ -8,7 +6,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 public unsafe partial struct View {
     // TODO check and update for 7.2
     [FieldOffset(0x8)] public uint Flags;
-    [FieldOffset(0xC)] public uint Unk;
+    [FieldOffset(0xC)] private uint Unk;
     //[FieldOffset(0x10)] public Rectangle CanvasRegion;
     [FieldOffset(0x10), FixedSizeArray] internal FixedSizeArray16<SubView> _subViews;
 }

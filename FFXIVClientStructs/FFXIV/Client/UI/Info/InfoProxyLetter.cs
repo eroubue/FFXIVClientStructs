@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Info;
 
 // Client::UI::Info::InfoProxyLetter
@@ -20,20 +18,20 @@ public unsafe partial struct InfoProxyLetter {
     [FieldOffset(0x2B)] public bool HasLettersFromSupportDesk;
     [FieldOffset(0x30), FixedSizeArray] internal FixedSizeArray130<Letter> _letters;
     //0xCC0 After
-    [FieldOffset(0x5178)] public Utf8String UnkString0;
-    [FieldOffset(0x51E0)] public Utf8String UnkString1;
+    [FieldOffset(0x7608)] private Utf8String UnkString0;
+    [FieldOffset(0x7670)] private Utf8String UnkString1;
 
     [GenerateInterop]
-    [StructLayout(LayoutKind.Explicit, Size = 0xA0)]
+    [StructLayout(LayoutKind.Explicit, Size = 0xE8)]
     public unsafe partial struct Letter {
         [FieldOffset(0x00)] public long SenderContentId;// 0xFFFFFFFF for Store
         [FieldOffset(0x08)] public int Timestamp;
         [FieldOffset(0x0C), FixedSizeArray] internal FixedSizeArray5<ItemAttachment> _attachments;
-        [FieldOffset(0x38)] public uint Gil;
-        [FieldOffset(0x3C)] public bool Read;
+        [FieldOffset(0x74)] public uint Gil;
+        [FieldOffset(0x78)] public bool Read;
 
-        [FieldOffset(0x3F), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _sender;
-        [FieldOffset(0x5F), FixedSizeArray(isString: true)] internal FixedSizeArray64<byte> _messagePreview;
+        [FieldOffset(0x87), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _sender;
+        [FieldOffset(0xA7), FixedSizeArray(isString: true)] internal FixedSizeArray64<byte> _messagePreview;
 
         [StructLayout(LayoutKind.Explicit, Size = 0x8)]
         public partial struct ItemAttachment {
@@ -41,4 +39,17 @@ public unsafe partial struct InfoProxyLetter {
             [FieldOffset(0x4)] public uint Count;
         }
     }
+
+    /// <summary></summary>
+    /// <param name="letterIndex">The letter that is being read.</param>
+    /// <param name="attatchmentSlot">The slot to be interacted with in the letter. (-1,0,1,2,3,4)</param>
+    /// <returns>If action is successful or not.</returns>
+    [MemberFunction("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 41 8B 57 30 45 33 C0")]
+    public partial bool TakeAttachments(uint letterIndex, int attatchmentSlot);
+
+    [MemberFunction("E8 ?? ?? ?? ?? 84 C0 74 27 49 8B 07")]
+    public partial bool DeleteLetter(uint letterIndex);
+
+    [MemberFunction("E8 ?? ?? ?? ?? EB 0F 45 33 FF")]
+    public partial bool RequestRewardDelivery();
 }

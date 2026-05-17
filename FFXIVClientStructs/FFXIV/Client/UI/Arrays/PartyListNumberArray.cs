@@ -2,7 +2,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Arrays;
 
-[CExporterIgnore]
 [GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 745 * 4)]
 public unsafe partial struct PartyListNumberArray {
@@ -25,7 +24,6 @@ public unsafe partial struct PartyListNumberArray {
     [FieldOffset(352 * 4), FixedSizeArray] internal FixedSizeArray7<PartyListMemberNumberArray> _trustMembers;
     [FieldOffset(653 * 4), FixedSizeArray] internal FixedSizeArray2<PartyListMemberNumberArray> _pets;
 
-    [CExporterIgnore]
     [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 43 * 4)]
     public partial struct PartyListMemberNumberArray {
@@ -66,7 +64,9 @@ public unsafe partial struct PartyListNumberArray {
         /// </summary>
         [FieldOffset(38 * 4)] public int CastTime;
         [FieldOffset(39 * 4)] public int CastId;
+        [Obsolete("Use EntityId Instead.")]
         [FieldOffset(41 * 4)] public int ContentId;
+        [FieldOffset(41 * 4)] public uint EntityId;
         [FieldOffset(42 * 4)] public bool Targetable;
     }
 }

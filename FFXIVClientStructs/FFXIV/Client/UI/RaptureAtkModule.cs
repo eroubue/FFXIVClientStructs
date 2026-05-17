@@ -1,5 +1,6 @@
+using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Common.Component.Excel;
@@ -14,7 +15,7 @@ namespace FFXIVClientStructs.FFXIV.Client.UI;
 //   Common::Configuration::ConfigBase::ChangeEventInterface
 [GenerateInterop]
 [Inherits<AtkModule>, Inherits<ChangeEventInterface>]
-[StructLayout(LayoutKind.Explicit, Size = 0x29EB0)]
+[StructLayout(LayoutKind.Explicit, Size = 0x2A940)]
 [VirtualTable("48 8D 05 ?? ?? ?? ?? 48 89 8F ?? ?? ?? ?? 48 89 07", 3)]
 public unsafe partial struct RaptureAtkModule {
     public static RaptureAtkModule* Instance() {
@@ -22,58 +23,62 @@ public unsafe partial struct RaptureAtkModule {
         return uiModule == null ? null : uiModule->GetRaptureAtkModule();
     }
 
-    [FieldOffset(0x82C0)] public ushort UiMode; // 0 = In Lobby, 1 = In Game
-    [FieldOffset(0x82C2)] public ushort UISetupStage; // unsure
+    [FieldOffset(0x8300)] public GameUIScene UIScene;
+    [FieldOffset(0x8302)] public GameUIMode UIMode;
 
-    [FieldOffset(0x8358)] internal Utf8String Unk8358;
-    [FieldOffset(0x83C0), FixedSizeArray] internal FixedSizeArray6<Utf8String> _unkArray;
-    [FieldOffset(0x8630)] public Utf8String ItalicOn; // <italic(1)>
-    [FieldOffset(0x8698)] public Utf8String ItalicOff; // <italic(0)>
-    [FieldOffset(0x8700)] public Utf8String BoldOn; // <bold(1)>
-    [FieldOffset(0x8768)] public Utf8String BoldOff; // <bold(0)>
+    [FieldOffset(0x83B0)] internal Utf8String Unk8358;
+    [FieldOffset(0x8418), FixedSizeArray] internal FixedSizeArray6<Utf8String> _unkArray;
+    [FieldOffset(0x8688)] public Utf8String ItalicOn; // <italic(1)>
+    [FieldOffset(0x86F0)] public Utf8String ItalicOff; // <italic(0)>
+    [FieldOffset(0x8758)] public Utf8String BoldOn; // <bold(1)>
+    [FieldOffset(0x87C0)] public Utf8String BoldOff; // <bold(0)>
 
-    [FieldOffset(0x8817)] public AgentUpdateFlags AgentUpdateFlag; // reset happens in RaptureAtkModule_OnUpdate
-    [FieldOffset(0x8818), FixedSizeArray] internal FixedSizeArray931<AddonFactoryInfo> _addonFactories;
-    [FieldOffset(0x11990)] public StdVector<Utf8String> AddonNames;
-    [FieldOffset(0x119A8)] public AddonConfig* AddonConfigPtr;
+    [FieldOffset(0x886F)] public AgentUpdateFlags AgentUpdateFlag; // reset happens in RaptureAtkModule_OnUpdate
+    [FieldOffset(0x8870), FixedSizeArray] internal FixedSizeArray990<AddonFactoryInfo> _addonFactories;
+    [FieldOffset(0x12320)] public StdVector<Utf8String> AddonNames;
+    [FieldOffset(0x12338)] public AddonConfig* AddonConfigPtr;
 
-    // [FieldOffset(0x119B8)] public ProhibitModule ProhibitModule;
-    [FieldOffset(0x11A50)] public int AudioClientRpcTagSize;
+    [FieldOffset(0x12342)] public AtkCursor.CursorType CursorType;
 
-    [FieldOffset(0x11A58)] public char* AudioClientRpcTag;
-    [FieldOffset(0x11A60)] public UIModule* UIModulePtr;
-    [FieldOffset(0x11A68)] public RaptureLogModule* RaptureLogModulePtr;
-    [FieldOffset(0x11A70)] public AgentModule AgentModule;
-    [FieldOffset(0x129C0)] public RaptureHotbarModule* RaptureHotbarModulePtr;
-    [FieldOffset(0x129C8)] public RaptureAtkUnitManager RaptureAtkUnitManager;
-    [FieldOffset(0x1C6E0)] public RaptureAtkColorDataManager RaptureAtkColorDataManager;
+    // [FieldOffset(0x12348)] public ProhibitModule ProhibitModule;
+    [FieldOffset(0x123E0)] public int AudioClientRpcTagSize;
 
-    [FieldOffset(0x1C960)] public int NameplateInfoCount;
-    [FieldOffset(0x1C968), FixedSizeArray] internal FixedSizeArray50<NamePlateInfo> _namePlateInfoEntries;
+    [FieldOffset(0x123E8)] public char* AudioClientRpcTag;
+    [FieldOffset(0x123F0)] public UIModule* UIModulePtr;
+    [FieldOffset(0x123F8)] public RaptureLogModule* RaptureLogModulePtr;
+    [FieldOffset(0x12400)] public AgentModule AgentModule;
+    [FieldOffset(0x13418)] public RaptureHotbarModule* RaptureHotbarModulePtr;
+    [FieldOffset(0x13420)] public RaptureAtkUnitManager RaptureAtkUnitManager;
+    [FieldOffset(0x1D150)] public RaptureAtkColorDataManager RaptureAtkColorDataManager;
 
-    [FieldOffset(0x23DE0), FixedSizeArray] internal FixedSizeArray18<CrystalCache> _crystalItemCache;
-    [FieldOffset(0x24890)] public ItemCache* KeyItemCache; // ptr to 120 entries
-    [FieldOffset(0x24898)] public ItemCache* EquippedItemCache; // ptr to 14 entries
-    [FieldOffset(0x248A0), FixedSizeArray] internal FixedSizeArray160<ItemCache> _inventoryItemCache; // see "E8 ?? ?? ?? ?? 48 8B 07 8D 55 05", only 140 slots are processed, unused?
-    [FieldOffset(0x29DA0)] public uint InventoryItemCacheSlotCount;
-    [FieldOffset(0x29DA4)] public uint GilCap;
+    [FieldOffset(0x1D3D0)] public int NameplateInfoCount;
+    [FieldOffset(0x1D3D8), FixedSizeArray] internal FixedSizeArray50<NamePlateInfo> _namePlateInfoEntries;
 
-    [FieldOffset(0x29DE8)] public uint LocalPlayerClassJobId;
-    [FieldOffset(0x29DEC)] public uint LocalPlayerLevel;
+    [FieldOffset(0x24850), FixedSizeArray] internal FixedSizeArray18<CrystalCache> _crystalItemCache;
+    [FieldOffset(0x25300)] public ItemCache* KeyItemCache; // ptr to 120 entries
+    [FieldOffset(0x25308)] public ItemCache* EquippedItemCache; // ptr to 14 entries
+    [FieldOffset(0x25310), FixedSizeArray] internal FixedSizeArray160<ItemCache> _inventoryItemCache; // only 140 slots are processed, unused?
+    [FieldOffset(0x2A810)] public uint InventoryItemCacheSlotCount;
+    [FieldOffset(0x2A814)] public uint GilCap;
 
-    [FieldOffset(0x29DF5)] public bool QuickGatheringEnabled;
+    [FieldOffset(0x2A878)] public uint LocalPlayerClassJobId;
+    [FieldOffset(0x2A87C)] public uint LocalPlayerLevel;
 
-    [FieldOffset(0x29E60)] internal ExcelSheet* AddonParamSheet;
-    [FieldOffset(0x29E68)] public AtkTexture CharaViewDefaultBackgroundTexture; // "ui/common/CharacterBg.tex" (or _hr1 variant)
+    [FieldOffset(0x2A885)] public bool QuickGatheringEnabled;
 
-    [FieldOffset(0x29E84)] public uint LoginSummonCompanionId;
-    [FieldOffset(0x29E88)] public float LoginSummonCompanionCountdown;
+    [FieldOffset(0x2A88B)] public bool QTEActive;
+
+    [FieldOffset(0x2A8F0)] internal ExcelSheet* AddonParamSheet;
+    [FieldOffset(0x2A8F8)] public AtkTexture CharaViewDefaultBackgroundTexture; // "ui/common/CharacterBg.tex" (or _hr1 variant)
+
+    [FieldOffset(0x2A914)] public uint LoginSummonCompanionId;
+    [FieldOffset(0x2A918)] public float LoginSummonCompanionCountdown;
     /// <remarks> Only for Region 5 </remarks>
-    [FieldOffset(0x29E8C)] public float HourTimer;
+    [FieldOffset(0x2A91C)] public float HourTimer;
     /// <remarks> Only for Region 5 </remarks>
-    [FieldOffset(0x29E90)] public int HoursPlayed;
+    [FieldOffset(0x2A920)] public int HoursPlayed;
 
-    [FieldOffset(0x29EA8)] internal nint ShellCommands; // only 1 function to open links?
+    [FieldOffset(0x2A938)] internal nint ShellCommands; // only 1 function to open links?
 
     [MemberFunction("48 89 5C 24 ?? 57 48 83 EC ?? 0F BF 81 ?? ?? ?? ?? 8B FA")]
     public partial bool ChangeUiMode(uint uiMode);
@@ -108,19 +113,31 @@ public unsafe partial struct RaptureAtkModule {
     [MemberFunction("E8 ?? ?? ?? ?? EB ?? 45 33 C9 49 8D 56 ?? 41 B0 01")]
     public partial void OpenDawnStory(uint contentFinderCondition);
 
+    [MemberFunction("E8 ?? ?? ?? ?? 48 8B B4 24 ?? ?? ?? ?? 48 8B AC 24 ?? ?? ?? ?? 48 8D 4C 24")]
+    public partial void OpenLuaUI(int id, int* args, long argCount);
+
     [MemberFunction("E8 ?? ?? ?? ?? 48 89 9B ?? ?? ?? ?? 48 8B CE")]
     public partial void OpenSatisfactionSupply(nint a2, uint satisfactionNPC, bool a4);
 
+    /// <remarks>
+    /// 0 = success <br/>
+    /// -1 = fail
+    /// </remarks>
+    [MemberFunction("40 53 55 57 41 56 48 81 EC ?? ?? ?? ?? 48 8B 84 24")]
+    public partial int UpdateBattleCharaNameplates(NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, BattleChara* battleChara, int numArrayIndex, int stringArrayIndex);
+
+    /// <remarks>
+    /// 0 = success <br/>
+    /// -1 = fail
+    /// </remarks>
+    [MemberFunction("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 4C 89 44 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8B 7C 24")]
+    public partial int UpdateNpcNameplates(NamePlateInfo* namePlateInfo, NumberArrayData* numArray, StringArrayData* stringArray, GameObject* gameObject, int numArrayIndex, int stringArrayIndex);
+
     public void OpenSatisfactionSupply(uint satisfactionNPC) => OpenSatisfactionSupply(nint.Zero, satisfactionNPC, true);
 
-    [VirtualFunction(39)]
-    public partial void SetUiVisibility(bool uiVisible);
-
-    [VirtualFunction(58)]
-    public partial void Update(float delta);
-
-    [VirtualFunction(63), GenerateStringOverloads]
-    public partial bool OpenMapWithMapLink(CStringPointer mapLink);
+    // CallbackHandlerFunctions[24]
+    [MemberFunction("48 89 5C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 55 41 56 41 57 48 8B EC 48 83 EC 40 4C 8B F1")]
+    public partial AtkValue* HandleItemMove(AtkValue* returnValue, AtkValue* values, uint valueCount);
 
     public bool IsUiVisible {
         get => !RaptureAtkUnitManager.AtkUnitManager.Flags.HasFlag(AtkUnitManagerFlags.UiHidden);
@@ -154,10 +171,30 @@ public unsafe partial struct RaptureAtkModule {
         [FieldOffset(0x74)] public uint IconId;
         [FieldOffset(0x78)] public uint StackSize;
         [FieldOffset(0x7C)] public byte EquipSlotCategory;
-        [FieldOffset(0x7D)] public byte AdditionalData; // if FilterGroup == 15
-        [FieldOffset(0x7E)] public byte LevelEquip;
-        [FieldOffset(0x7F)] public byte SubStatCategory;
-        [FieldOffset(0x80)] public short LevelItem;
+        [FieldOffset(0x7D)] public byte AdditionalDataCount;
+        /// <remarks>
+        /// Only set if FilterGroup == 15
+        /// </remarks>
+        [FieldOffset(0x7E)] public byte AdditionalData;
+        [FieldOffset(0x7F)] public byte LevelEquip;
+        [FieldOffset(0x80)] public byte SubStatCategory;
+        [FieldOffset(0x82)] public short LevelItem;
+        /// <remarks>
+        /// Only set if item contains a glamour and not FilterGroup == 15
+        /// </remarks>
+        [FieldOffset(0x84)] public uint GlamourId;
+
+        [VirtualFunction(0)]
+        public partial ItemCache* Dtor(byte freeFlags);
+
+        [VirtualFunction(1)]
+        public partial void Clear();
+
+        [VirtualFunction(2)]
+        public partial bool SetFromInventoryItem(InventoryItem* item);
+
+        [VirtualFunction(3)]
+        public partial void Update(uint itemId, [CExporterExcel("Item")] void* itemPtr, uint glamourId, [CExporterExcel("Item")] void* glamourItemPtr);
     }
 
     // Client::UI::RaptureAtkModule::InventoryCache
@@ -172,24 +209,59 @@ public unsafe partial struct RaptureAtkModule {
 
     [StructLayout(LayoutKind.Explicit, Size = 0x28)]
     public struct AddonFactoryInfo {
-        // Create(RaptureAtkModule* thisPtr, byte* addonName, uint numValues, AtkValue* values)
-        [FieldOffset(0)] public delegate*<RaptureAtkModule*, byte*, uint, AtkValue*, nint> Create;
+        public delegate AtkUnitBase* CreateDelegate(RaptureAtkModule* thisPtr, CStringPointer addonName, uint valueCount, AtkValue* values);
+
+        [FieldOffset(0)] public delegate* unmanaged<RaptureAtkModule*, CStringPointer, uint, AtkValue*, AtkUnitBase*> Create;
     }
 
     [Flags]
     public enum AgentUpdateFlags : byte {
-        None = 0x00,
-        InventoryUpdate = 0x01,
-        ActionBarUpdate = 0x02, // Triggered by using Actions, Inventories, Gearsets, Macros
-        RetainerUpdate = 0x04,
-        NameplateUpdate = 0x08,
-        UnlocksUpdate = 0x10, // Triggered by Mounts, Minions, Orchestrion Rolls, Sightseeing Log, UnlockLinks...
-        MainCommandEnabledStateUpdate = 0x20,
-        HousingInventoryUpdate = 0x40,
+        None = 0,
+
+        /// <remarks> Set when an inventory has been updated. </remarks>
+        InventoryUpdate = 1 << 0,
+
+        /// <remarks> Set when a hotbar slot has been executed, or a Gearset or Macro has been changed. </remarks>
+        ActionBarUpdate = 1 << 1,
+
+        /// <remarks> Set when the RetainerMarket inventory has been updated. </remarks>
+        RetainerMarketInventoryUpdate = 1 << 2,
+
+        /// <remarks> Unknown use case. </remarks>
+        NameplateUpdate = 1 << 3,
+
+        /// <remarks> Set when the player unlocked collectibles, contents or systems. </remarks>
+        UnlocksUpdate = 1 << 4,
+
+        /// <remarks> Set when <see cref="AgentHUD.SetMainCommandEnabledState"/> was called. </remarks>
+        MainCommandEnabledStateUpdate = 1 << 5,
+
+        /// <remarks> Set when any housing inventory has been updated. </remarks>
+        HousingInventoryUpdate = 1 << 6,
+
+        /// <remarks> Set when any content inventory has been updated. </remarks>
+        ContentInventoryUpdate = 1 << 7,
     }
 
     public enum TextGimmickHintStyle : byte {
         Warning = 0,
         Info = 1,
     }
+}
+
+public enum GameUIScene : ushort {
+    LobbyMain = 0,
+    GameMain = 1,
+}
+
+public enum GameUIMode : ushort {
+    Normal = 0,
+    ChocoboRace = 1,
+    Lovm = 2, // Lord of Verminion
+    PvPSpectator = 3,
+    ContentsReplay = 4,
+    Emj = 5, // Doman Mahjong
+    EmjSolo = 6,
+    RideShooting = 7,
+    TripleTriad = 8,
 }

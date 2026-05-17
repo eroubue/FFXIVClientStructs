@@ -1,7 +1,7 @@
 namespace FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 /// <remarks>
-/// Note: The game does not clear the data when a mark is completed.<br/>
+/// NB: The game does not clear the data when a mark is completed.<br/>
 /// <br/>
 /// Index Order is a little weird<br/>
 /// The `A Realm Reborn Elite` was added after Heavensward<br/>
@@ -65,7 +65,7 @@ public unsafe partial struct MobHunt {
     /// <param name="itemId">Mark Bill ItemId</param>
     /// <returns>MaxMarkIndex Value Indicates Not Found</returns>
     [MemberFunction("E8 ?? ?? ?? ?? 0F B6 D0 48 8D 0D ?? ?? ?? ?? 44 0F B6 E8")]
-    public partial int GetMarkIndexFromItemId(uint itemId);
+    public partial byte GetMarkIndexFromItemId(uint itemId);
 
     [MemberFunction("48 89 5C 24 ?? 56 48 83 EC 20 0F B6 DA 40 32 F6")]
     public partial bool IsMarkBillUnlocked(byte markIndex);

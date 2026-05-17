@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
@@ -35,7 +34,7 @@ public unsafe partial struct AddonWeeklyPuzzle {
         [FieldOffset(0x8)] public AtkResNode* Res;
         [FieldOffset(0x10)] public AtkTextNode* NameText;
         [FieldOffset(0x18)] public AtkTextNode* RewardText;
-        [FieldOffset(0x20)] public long Unk20;
+        [FieldOffset(0x20)] private long Unk20;
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 0x6C0)]
@@ -83,8 +82,8 @@ public unsafe partial struct AddonWeeklyPuzzle {
         [FieldOffset(0x0)] public AddonWeeklyPuzzle* self;
         [FieldOffset(0x8)] public AtkComponentButton* Button;
         [FieldOffset(0x10)] public AtkResNode* RevealedIconResNode;
-        [FieldOffset(0x18)] public AtkResNode* UnkRes20;
+        [FieldOffset(0x18)] private AtkResNode* UnkRes20;
         [FieldOffset(0x20)] public AtkResNode* RevealedTileResNode;
-        [FieldOffset(0x28)] public long Unk28;
+        [FieldOffset(0x28)] private long Unk28;
     }
 }

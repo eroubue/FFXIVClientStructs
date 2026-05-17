@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.System.Input;
-using static FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitManager;
 
 namespace FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -8,7 +7,10 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 [StructLayout(LayoutKind.Explicit, Size = 0x08)]
 public unsafe partial struct AtkModuleInterface {
     [VirtualFunction(0)]
-    public partial void Dtor(bool free);
+    public partial AtkModuleInterface* Dtor(byte freeFlags);
+
+    [VirtualFunction(4)]
+    public partial bool IsUIReady(bool ignoreHudInitialized = false);
 
     [VirtualFunction(9)]
     public partial NumberArrayData* GetNumberArrayData(int index);
@@ -55,11 +57,14 @@ public unsafe partial struct AtkModuleInterface {
     [VirtualFunction(33)]
     public partial bool IsCursorVisible();
 
+    [VirtualFunction(39)]
+    public partial void SetUiVisibility(bool uiVisible);
+
     [VirtualFunction(40)]
     public partial SoftKeyboardDeviceInterface* GetSoftKeyboardDeviceInterface();
 
-    [VirtualFunction(44)]
-    public partial AddonStatus GetAddonStatus(uint addonId);
+    [VirtualFunction(66)]
+    public partial void OnCursorTypeChange(AtkCursor.CursorType cursorType);
 
     // Component::GUI::AtkModuleInterface::AtkEventInterface
     // no explicit constructor, just an event interface 
@@ -69,7 +74,11 @@ public unsafe partial struct AtkModuleInterface {
         [VirtualFunction(0)]
         public partial AtkValue* ReceiveEvent(AtkValue* returnValue, AtkValue* values, uint valueCount, ulong eventKind);
 
+        [VirtualFunction(1), Obsolete("Renamed to ReceiveEventWithResult", true)]
+        public partial AtkValue* ReceiveEvent2(AtkValue* returnValue, AtkValue* values, uint valueCount, ulong eventKind);
+
+        /// <remarks> Using FireCallbackWithResult, the return value is actually forwarded to the caller and might have a different ValueType besides bool. </remarks>
         [VirtualFunction(1)]
-        public partial AtkValue* ReceiveEvent2(AtkValue* returnValue, AtkValue* values, uint valueCount, ulong eventKind); // seems to handle user input validation? but.. not always 🤔
+        public partial AtkValue* ReceiveEventWithResult(AtkValue* returnValue, AtkValue* values, uint valueCount, ulong eventKind);
     }
 }

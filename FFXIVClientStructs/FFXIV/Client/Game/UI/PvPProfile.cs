@@ -4,7 +4,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.UI;
 [GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x8C)]
 public unsafe partial struct PvPProfile {
-    [StaticAddress("48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 3C ?? 0F 84 ?? ?? ?? ?? 48 85 DB", 3)]
+    [StaticAddress("48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 3C ?? 75 ?? B8 ?? ?? ?? ?? EB ?? B8", 3)]
     public static partial PvPProfile* Instance();
 
     [FieldOffset(0x0)] public bool IsLoaded;
@@ -55,7 +55,7 @@ public unsafe partial struct PvPProfile {
     [FieldOffset(0x88)] public uint RivalWingsWeeklyMatchesWon;
 
     /// <summary>Gets the current PvP rank for the active Grand Company.</summary>
-    [MemberFunction("E8 ?? ?? ?? ?? 3A 47 4F")]
+    [MemberFunction("E8 ?? ?? ?? ?? 38 43 4F")]
     public partial byte GetPvPRank();
 
     /// <summary>Gets the total accumulated PvP experience for the active Grand Company.</summary>

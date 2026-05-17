@@ -1,4 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Common;
 using FFXIVClientStructs.FFXIV.Component.Shell;
@@ -49,10 +48,9 @@ public unsafe partial struct RaptureShellModule {
     [FieldOffset(0x1208)] public ushort TempTellWorldId;
     [FieldOffset(0x120A)] public ushort TempTellReason;
 
+    [BitField<bool>(nameof(IsTextCommandUnavailable), 0)]
     [FieldOffset(0x1248)] public uint Flags;
     [FieldOffset(0x124C)] public uint ErrorData; // ??? seems to be a byte + flags
-
-    public bool IsTextCommandUnavailable => (Flags & 1) != 0;
 
     [MemberFunction("48 89 5C 24 ?? 41 56 48 83 EC ?? 80 B9 ?? ?? ?? ?? ?? 4C 8B F2")]
     public partial void ExecuteMacro(RaptureMacroModule.Macro* macro);
@@ -64,7 +62,7 @@ public unsafe partial struct RaptureShellModule {
     public partial bool TryGetMacroIconCommand(RaptureMacroModule.Macro* macro, void* resultsOut);
 
     [MemberFunction("E8 ?? ?? ?? ?? 0F B7 44 37 ??")]
-    public partial void ChangeChatChannel(int channel, uint linkshellIndex, Utf8String* target, bool setChatType);
+    public partial bool ChangeChatChannel(int channel, uint linkshellIndex, Utf8String* target, bool setChatType);
 
     [MemberFunction("E8 ?? ?? ?? ?? 4C 8B 7C 24 ?? EB 34")]
     public partial bool SetContextTellTarget(Utf8String* playerName, Utf8String* worldName, ushort worldId, ulong accountId, ulong contentId, ushort reason, bool setChatType);
@@ -75,6 +73,6 @@ public unsafe partial struct RaptureShellModule {
     [MemberFunction("48 89 5C 24 ?? 55 56 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8B 02 41 0F B7 E9")]
     public partial bool SetTellTargetInForay(Utf8String* playerName, Utf8String* worldName, ushort worldId, ulong accountId, ulong contentId, ushort reason, bool setChatType);
 
-    [MemberFunction("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B D0 44 89 64 24")]
+    [MemberFunction("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B D0 44 89 6C 24")]
     public partial void ReplyInSelectedChatMode();
 }

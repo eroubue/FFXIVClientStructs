@@ -1,5 +1,5 @@
-using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
@@ -17,14 +17,14 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 //
 [GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x318)]
-public unsafe partial struct CharaView : ICreatable {
+public unsafe partial struct CharaView : ICreatable<CharaView> {
     [FieldOffset(0x8)] public uint State; // initialization state of KernelTexture, Camera etc. that happens in Render(), 6 = ready for use
     [FieldOffset(0xC)] public uint ClientObjectId; // ID of object in ClientObjectManager, basically ClientObjectIndex + 40
     [FieldOffset(0x10)] public uint ClientObjectIndex;
     [FieldOffset(0x14)] public uint CameraType; // turns portrait ambient/directional lighting on/off
     [FieldOffset(0x18)] public nint CameraManager;
     [FieldOffset(0x20)] public Camera* Camera;
-    //[FieldOffset(0x28)] public nint Unk28; // float CharacterRotation?
+    //[FieldOffset(0x28)] private nint Unk28; // float CharacterRotation?
     [FieldOffset(0x30)] public AgentInterface* Agent; // for example: AgentTryOn
     /// <remarks> (AgentInterface* agent, Texture* charaViewTexture) -> void </remarks>
     [FieldOffset(0x38)] public nint AgentCallbackReady; // if set, called when State changes to Ready
@@ -37,19 +37,21 @@ public unsafe partial struct CharaView : ICreatable {
     [FieldOffset(0xEC)] public float ZoomRatio;
 
     [FieldOffset(0xF8), FixedSizeArray] internal FixedSizeArray14<CharaViewItem> _items;
-
+    // [FieldOffset(0x2B8)] struct of size 0x50
     [FieldOffset(0x308)] public byte FreeCompanyCrestBitfield;
     [FieldOffset(0x309)] public bool CharacterDataCopied;
     [FieldOffset(0x30A)] public bool CharacterLoaded;
+    [FieldOffset(0x30B)] public bool IsInSanctumOfTheTwelve;
 
+    [Obsolete("Incorrectly inherited by CharaViewPortrait. Do not call this; copy the code and adapt it to the correct type.", true)]
     public static CharaView* Create()
         => IMemorySpace.GetUISpace()->Create<CharaView>();
 
     [MemberFunction("E8 ?? ?? ?? ?? 33 ED C6 86 ?? ?? ?? ?? ?? 48 8D 05")]
-    public partial void Ctor();
+    public partial CharaView* Ctor();
 
     [VirtualFunction(0)]
-    public partial void Dtor(bool freeMemory);
+    public partial CharaView* Dtor(byte freeFlags);
 
     [VirtualFunction(1)]
     public partial void Initialize(AgentInterface* agent, uint clientObjectId, nint agentCallbackReady);
@@ -113,7 +115,7 @@ public unsafe partial struct CharaViewModelData {
 
 [GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x7C)]
-public unsafe partial struct CharaViewCharacterData : ICreatable {
+public unsafe partial struct CharaViewCharacterData : ICreatable<CharaViewCharacterData> {
     [FieldOffset(0)] public CustomizeData CustomizeData;
     // Unk 2 bytes
     [FieldOffset(0x1C), FixedSizeArray] internal FixedSizeArray14<uint> _itemIds;
@@ -136,7 +138,7 @@ public unsafe partial struct CharaViewCharacterData : ICreatable {
     }
 
     [MemberFunction("E8 ?? ?? ?? ?? 4D 8D 4E 30 49 8B D6")]
-    public partial void Ctor();
+    public partial CharaViewCharacterData* Ctor();
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B 57 28 45 33 F6")]
     public partial void ImportLocalPlayerEquipment();
@@ -151,7 +153,7 @@ public struct CharaViewItem {
     [FieldOffset(0x4)] public byte Stain1Id;
     [FieldOffset(0x5)] public byte GlamourStain0Id;
     [FieldOffset(0x6)] public byte GlamourStain1Id;
-    //[FieldOffset(0x7)] public byte Unk7;
+    [FieldOffset(0x7)] public bool ApplyCompanyCrest;
     [FieldOffset(0x8)] public uint ItemId;
     [FieldOffset(0xC)] public uint GlamourItemId;
     [FieldOffset(0x10)] public ulong ModelMain; // WeaponModelId or EquipmentModelId
