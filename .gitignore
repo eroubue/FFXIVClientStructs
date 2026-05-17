@@ -362,3 +362,4 @@ ida/uld_names.txt
 
 # CompatChecker test files
 tests/
+ida/ffxiv_exdgetters.py.bak
